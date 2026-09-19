@@ -1,0 +1,67 @@
+# ============================================================
+# CENTRAL CONFIG — An End-to-End Real-time Streaming Pipeline
+# for Pump-and-Dump Detection in Cryptocurrency Markets
+# ============================================================
+# Rule: EVERY magic number lives here. Code reads this file.
+# Change a constant in one place → changes everywhere.
+
+paths:
+  raw_dir: data/raw
+  labels_csv: data/labels/pumps_binance.csv
+  processed_dir: data/processed
+  artifacts_dir: artifacts
+
+data:
+  quote_asset: BTC
+  days_before_event: 3
+  days_after_event: 1
+  normal_days_per_symbol: 6
+
+bars:
+  bar_seconds: 5
+  z_window: 720        # 720 bars × 5s = 1h rolling context
+  vol_window: 60        # 60 bars × 5s = 5min rolling volatility
+
+windows:
+  window_bars: 120      # 120 bars × 5s = 10 min lookback
+  stride_bars: 12       # slide 1 min
+  pre_minutes: 60       # positive: [t_pump - 60min, t_pump + 5min]
+  during_minutes: 5
+  buffer_hours: 3       # exclude ±3h from negatives
+  neg_ratio_train: 10   # train: 10 negatives per positive
+  neg_cap_eval: 50      # val/test: cap at 50x
+
+split:
+  train_frac: 0.70
+  val_frac: 0.15        # test = 1 - train - val
+
+cleaning:
+  static_pct: 0.02
+  adaptive_k0: 6.0
+  regime_clip: [0.5, 3.0]
+  tick_sigma_window: 500
+
+model:
+  d_model: 64
+  n_heads: 4
+  n_layers: 3           # pilot: use 2 for speed
+  dropout: 0.1
+  lambda_k: 3.0
+  mask_ratio: 0.25
+
+train:
+  batch_size: 64
+  pretrain_epochs: 10    # pilot: 5
+  finetune_epochs: 30
+  lr: 1.0e-4
+  patience: 6
+  pos_class_weight: auto
+  seed: 42
+
+pipeline:
+  kafka_bootstrap: localhost:9092
+  topic_raw: raw-trades
+  topic_bars: bars
+  topic_alerts: alerts
+  live_symbols: [BTCUSDT, ETHUSDT]
+  alert_threshold: null   # null = use threshold from saved checkpoint

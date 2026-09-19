@@ -1,0 +1,33 @@
+# Data (huge, easily re-downloaded)
+data/raw/
+data/processed/
+# Trained model checkpoints
+artifacts/
+
+
+# Python virtual environment (LARGE - 25,000+ files)
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Secrets
+.env
+*.key
+*.pem
+.venv/
