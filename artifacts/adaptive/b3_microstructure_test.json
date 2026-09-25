@@ -1,0 +1,15 @@
+{
+  "tag": "b3_microstructure",
+  "precision": 0.0869,
+  "recall": 0.072,
+  "f1": 0.0788,
+  "roc_auc": 0.6007,
+  "pr_auc": 0.0482,
+  "event_recall": 0.62,
+  "events_detected": 31,
+  "events_total": 50,
+  "fa_per_symbol_day": 9.138,
+  "f1_lo": 0.0577,
+  "f1_hi": 0.1021,
+  "thr": 0.603242
+}

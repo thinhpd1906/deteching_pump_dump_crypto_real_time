@@ -1,0 +1,9 @@
+=== SELF-SUPERVISED PRETRAINING [adaptive] ===
+  unlabeled windows : 146,240
+  window / features : 120 x 10
+  params            : 152,214
+  device            : cpu   epochs: 5   seed: 42
+  mask ratio        : 0.25   lambda_k: 3.0
+  epoch 01/5  recon=0.379410  (21123.6s)
+  epoch 02/5  recon=0.275567  (3182.0s)
+  epoch 03/5  recon=0.235769  (2916.9s)

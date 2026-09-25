@@ -15,6 +15,7 @@ fine-tuning.
 Usage:
     python -m src.training.pretrain --clean adaptive
     python -m src.training.pretrain --clean adaptive --epochs 5   # pilot speed
+    python -m src.training.pretrain --clean adaptive --resume     # continue a crashed run
 """
 from __future__ import annotations
 
@@ -56,6 +57,12 @@ def main() -> None:
     ap.add_argument("--clean", default="adaptive")
     ap.add_argument("--epochs", type=int, default=None)
     ap.add_argument("--seed", type=int, default=None)
+    ap.add_argument("--resume", action="store_true",
+                    help="load existing at_pretrained.pt checkpoint and "
+                         "continue training instead of starting from scratch")
+    ap.add_argument("--start-epoch", type=int, default=None,
+                    help="epoch number to resume from (1-indexed). Defaults "
+                         "to checkpoint's saved epoch + 1 when --resume is set")
     args = ap.parse_args()
 
     cfg = yaml.safe_load(open(args.config))
@@ -81,6 +88,20 @@ def main() -> None:
     opt = torch.optim.AdamW(model.parameters(), lr=TR["lr"])
     epochs = args.epochs or TR["pretrain_epochs"]
 
+    path = os.path.join(art, "at_pretrained.pt")
+    start_epoch = args.start_epoch or 1
+    if args.resume:
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"--resume given but no checkpoint found at {path}")
+        ckpt = torch.load(path, map_location=dev)
+        model.load_state_dict(ckpt["state_dict"])
+        if "optimizer_state_dict" in ckpt:
+            opt.load_state_dict(ckpt["optimizer_state_dict"])
+        if args.start_epoch is None:
+            start_epoch = ckpt.get("epoch", 0) + 1
+        print(f"  resumed from      : {path} (epoch {ckpt.get('epoch', '?')})")
+
     n_params = sum(p.numel() for p in model.parameters())
     print(f"=== SELF-SUPERVISED PRETRAINING [{args.clean}] ===")
     print(f"  unlabeled windows : {len(X):,}")
@@ -88,8 +109,10 @@ def main() -> None:
     print(f"  params            : {n_params:,}")
     print(f"  device            : {dev}   epochs: {epochs}   seed: {seed}")
     print(f"  mask ratio        : {M['mask_ratio']}   lambda_k: {M['lambda_k']}")
+    if start_epoch > 1:
+        print(f"  starting at epoch : {start_epoch}")
 
-    for ep in range(1, epochs + 1):
+    for ep in range(start_epoch, epochs + 1):
         model.train()
         t0, rec_sum, n = time.time(), 0.0, 0
         for (xb,) in loader:
@@ -111,9 +134,11 @@ def main() -> None:
         print(f"  epoch {ep:02d}/{epochs}  recon={rec_sum / n:.6f}  "
               f"({time.time() - t0:.1f}s)")
 
-    path = os.path.join(art, "at_pretrained.pt")
-    torch.save({"state_dict": model.state_dict(), "win": win, "d_in": d_in,
-                "model_cfg": M}, path)
+        torch.save({"state_dict": model.state_dict(),
+                    "optimizer_state_dict": opt.state_dict(),
+                    "epoch": ep, "win": win, "d_in": d_in,
+                    "model_cfg": M}, path)
+
     print(f"\n  saved encoder -> {path}")
 
     # ---- sanity: does the unsupervised score already separate pos from neg?

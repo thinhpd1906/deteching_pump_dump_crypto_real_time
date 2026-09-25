@@ -8,155 +8,174 @@ Three measurements:
   2. Differential removal: are removed trades concentrated near pump events?
   3. Feature distribution shift: KS statistic on z_ret/z_vol between modes
 
-PASS: removal >= 0.3% OR differential removal (pump>normal) OR KS > 0.05
+PASS: removal >= 0.3% OR differential removal (pump < normal, ratio<0.5)
+      OR KS > 0.05
 FAIL: cleaning is cosmetic -> strengthen the intervention OR demote C1.
+
+Data sources (both are read-only; nothing under data/processed/ or the
+src/cleaning, src/data pipeline modules is modified by this script):
+
+  Measurements 1 & 2 read data/processed/{mode}/cleaning_stats.json, which
+  is written by `src.data.build_dataset` from a full run over ALL downloaded
+  pairs. That pipeline applies `clean_ticks` per CONTIGUOUS-CALENDAR-DAY
+  CHUNK (see `load_symbol_chunks` in src/data/build_dataset.py) -- this is
+  the authoritative, already-computed number and is preferred over
+  recomputing from raw here.
+
+  Earlier versions of this script re-concatenated a pair's ENTIRE raw
+  history (all downloaded files, which can span years across disjoint
+  pump/normal-day download windows) and called `trades_to_bars` on it
+  directly. Because `trades_to_bars` resamples onto a CONTINUOUS 5s grid,
+  that bridges multi-year gaps between a pair's disjoint download clusters
+  with tens of millions of phantom empty bars -> OOM (observed: a single
+  pair, DLTBTC, spans 2018-01-28 to 2020-12-27 = ~1065 days -> ~18M phantom
+  bars). `build_dataset.py` avoids this by chunking per contiguous
+  calendar-day run before ever calling `trades_to_bars`. This script now
+  avoids the problem entirely for measurement 3 by reading the FEATURES
+  that `build_dataset.py` already computed correctly (per-chunk) and saved
+  into data/processed/{mode}/{train,val,test}.npz, rather than recomputing
+  bars/features from raw ticks.
 
 Usage:
     python -m scripts.gate_c_cleaning
 """
 from __future__ import annotations
 
-import glob
 import json
 import os
 
 import numpy as np
-import pandas as pd
-import yaml
 from scipy import stats
 
-from src.cleaning.filters import clean_ticks, cleaning_stats
 from src.data.features import FEATURES
 
+RNG = np.random.default_rng(42)
+KS_SAMPLE_CAP = 50000
 
-def load_raw(raw_dir: str, pair: str) -> pd.DataFrame | None:
-    files = sorted(glob.glob(os.path.join(raw_dir, pair, "*.parquet")))
-    if not files:
-        return None
-    return pd.concat([pd.read_parquet(f) for f in files], ignore_index=True)
+
+def _load_cleaning_stats(mode: str, processed_dir: str) -> dict:
+    path = os.path.join(processed_dir, mode, "cleaning_stats.json")
+    if not os.path.exists(path):
+        raise SystemExit(
+            f"Missing {path}. Run `python -m src.data.build_dataset "
+            f"--clean {mode}` first (this gate reads its output, it does "
+            f"not rebuild datasets)."
+        )
+    return json.load(open(path))
+
+
+def _load_feature_samples(mode: str, processed_dir: str, feat_name: str,
+                          rng: np.random.Generator) -> np.ndarray:
+    """Pull one sample per window (the window's END bar) for `feat_name`,
+    concatenated across train/val/test, then randomly subsample to
+    KS_SAMPLE_CAP. Using the end bar (not every bar in every overlapping
+    window) avoids re-counting the same underlying 5s bar dozens of times
+    due to the stride-12-of-120 window overlap.
+    """
+    feat_idx = FEATURES.index(feat_name)
+    parts = []
+    for split in ("train", "val", "test"):
+        path = os.path.join(processed_dir, mode, f"{split}.npz")
+        if not os.path.exists(path):
+            continue
+        d = np.load(path)
+        X = d["X"]  # [N, T, F]
+        if len(X) == 0:
+            continue
+        parts.append(X[:, -1, feat_idx])
+    if not parts:
+        return np.array([])
+    vals = np.concatenate(parts)
+    if len(vals) > KS_SAMPLE_CAP:
+        vals = rng.choice(vals, size=KS_SAMPLE_CAP, replace=False)
+    return vals
 
 
 def main():
-    cfg = yaml.safe_load(open("config/config.yaml"))
-    C = cfg["cleaning"]
-    W = cfg["windows"]
-    raw_dir = cfg["paths"]["raw_dir"]
-    labels = pd.read_csv(cfg["paths"]["labels_csv"], parse_dates=["pump_time"])
+    processed_dir = "data/processed"
 
-    pairs = [p for p in sorted(labels["pair"].unique())
-             if os.path.isdir(os.path.join(raw_dir, p))]
-    if not pairs:
-        print("ERROR: No downloaded data. Run download_binance first.")
-        return
+    print("GATE C: Cleaning diagnostics (reading production build outputs)\n")
 
-    print(f"GATE C: Cleaning diagnostics on {len(pairs)} pairs\n")
+    results = {}
+    for mode in ("none", "static", "adaptive"):
+        results[mode] = _load_cleaning_stats(mode, processed_dir)
 
-    results = {mode: {"ticks_in": 0, "removed": 0,
-                      "removed_pump": 0, "removed_normal": 0}
-               for mode in ("static", "adaptive")}
-
-    # Feature distributions per mode for KS test
-    feat_idx = FEATURES.index("z_ret")
-    vol_idx = FEATURES.index("z_vol")
-    feats_none = {"z_ret": [], "z_vol": []}
-    feats_adapt = {"z_ret": [], "z_vol": []}
-
-    for pair in pairs[:30]:  # limit for speed
-        raw = load_raw(raw_dir, pair)
-        if raw is None or len(raw) < 500:
-            continue
-
-        ptimes = labels.loc[labels["pair"] == pair, "pump_time"]
-
-        for mode in ("static", "adaptive"):
-            cleaned = clean_ticks(
-                raw, mode,
-                static_pct=C["static_pct"], k0=C["adaptive_k0"],
-                tick_sigma_window=C["tick_sigma_window"],
-                regime_clip=tuple(C["regime_clip"]),
-            )
-            st = cleaning_stats(raw, cleaned)
-            results[mode]["ticks_in"] += st["ticks_in"]
-            results[mode]["removed"] += st["removed"]
-
-            if st["removed"] > 0:
-                kept_ids = set(cleaned["agg_id"].to_numpy())
-                removed = raw.loc[~raw["agg_id"].isin(kept_ids)]
-                rem_ts = pd.to_datetime(removed["time"], unit="ms", utc=True)
-
-                near_pump = np.zeros(len(rem_ts), dtype=bool)
-                for t in ptimes:
-                    near_pump |= np.asarray(
-                        (rem_ts >= t - pd.Timedelta(minutes=W["pre_minutes"])) &
-                        (rem_ts <= t + pd.Timedelta(minutes=W["during_minutes"])))
-                results[mode]["removed_pump"] += int(near_pump.sum())
-                results[mode]["removed_normal"] += int((~near_pump).sum())
-
-        # Feature distributions: none vs adaptive on same symbol
-        from src.data.features import trades_to_bars, bars_to_features
-        B = cfg["bars"]
-        for mode_key, feats_dict in [("none", feats_none),
-                                      ("adaptive", feats_adapt)]:
-            cleaned = clean_ticks(raw, mode_key,
-                                  static_pct=C["static_pct"],
-                                  k0=C["adaptive_k0"],
-                                  tick_sigma_window=C["tick_sigma_window"],
-                                  regime_clip=tuple(C["regime_clip"]))
-            bars = trades_to_bars(cleaned, B["bar_seconds"])
-            feats = bars_to_features(bars, B["z_window"], B["vol_window"])
-            feats_dict["z_ret"].extend(feats["z_ret"].to_numpy().tolist())
-            feats_dict["z_vol"].extend(feats["z_vol"].to_numpy().tolist())
-
-    print("=== MEASUREMENT 1: Removal rates ===")
+    print("=== MEASUREMENT 1: Removal rates (source: cleaning_stats.json, "
+          "all downloaded pairs) ===")
     any_pass = False
+    triggers = []
     for mode in ("static", "adaptive"):
         r = results[mode]
-        pct = 100 * r["removed"] / max(r["ticks_in"], 1)
+        pct = r["removed_pct"]
         print(f"  {mode:10s}: {r['removed']:,} removed / {r['ticks_in']:,} "
               f"({pct:.4f}%)")
         if pct >= 0.3:
             print(f"    -> removal >= 0.3%: evidence of meaningful cleaning")
             any_pass = True
+            triggers.append(f"removal_rate_{mode}>=0.3%")
 
-    print("\n=== MEASUREMENT 2: Differential removal (pump vs normal) ===")
+    print("\n=== MEASUREMENT 2: Differential removal (pump-window vs normal) ===")
     for mode in ("static", "adaptive"):
         r = results[mode]
         tot = max(r["removed"], 1)
-        pump_frac = r["removed_pump"] / tot
-        norm_frac = r["removed_normal"] / tot
+        pump_frac = r["removed_in_pump"] / tot
+        norm_frac = r["removed_in_normal"] / tot
+        ratio = pump_frac / (norm_frac + 1e-9)
         print(f"  {mode:10s}: pump-window={pump_frac:.4f}  "
-              f"normal={norm_frac:.4f}  "
-              f"ratio={pump_frac/(norm_frac+1e-9):.2f}x")
+              f"normal={norm_frac:.4f}  ratio(pump/normal)={ratio:.3f}x")
+        results[mode]["pump_frac"] = pump_frac
+        results[mode]["normal_frac"] = norm_frac
+        results[mode]["pump_normal_ratio"] = ratio
         if pump_frac < norm_frac * 0.5:
-            print(f"    -> cleaning removes MORE from normal periods (good: pump signal preserved)")
+            print(f"    -> cleaning removes MORE from normal periods "
+                  f"(good: pump signal preserved)")
             any_pass = True
+            triggers.append(f"differential_removal_{mode}")
 
-    print("\n=== MEASUREMENT 3: Feature distribution shift (KS test) ===")
+    print("\n=== MEASUREMENT 3: Feature distribution shift (KS test, "
+          "none vs adaptive) ===")
+    print("  (source: end-bar feature values from data/processed/{mode}/"
+          "{train,val,test}.npz -- one sample per window to avoid "
+          "double-counting overlapping windows)")
+    ks_results = {}
     for feat in ("z_ret", "z_vol"):
-        a = np.array(feats_none[feat])
-        b = np.array(feats_adapt[feat])
+        a = _load_feature_samples("none", processed_dir, feat, RNG)
+        b = _load_feature_samples("adaptive", processed_dir, feat, RNG)
         if len(a) > 100 and len(b) > 100:
-            ks, pval = stats.ks_2samp(a[:50000], b[:50000])
-            print(f"  KS({feat}): statistic={ks:.5f}  p={pval:.4f}",
-                  end="")
+            ks, pval = stats.ks_2samp(a, b)
+            print(f"  KS({feat}): statistic={ks:.5f}  p={pval:.4g}  "
+                  f"(n_none={len(a):,}, n_adaptive={len(b):,})", end="")
+            ks_results[feat] = {"statistic": float(ks), "pvalue": float(pval),
+                                "n_none": int(len(a)), "n_adaptive": int(len(b))}
             if ks > 0.05:
                 print("  -> significant shift (cleaning changes feature distribution)")
                 any_pass = True
+                triggers.append(f"ks_{feat}>0.05")
             else:
                 print("  -> no significant shift")
+        else:
+            print(f"  KS({feat}): insufficient data (n_none={len(a)}, "
+                  f"n_adaptive={len(b)})")
+            ks_results[feat] = None
 
     # Save results for the paper
     os.makedirs("artifacts", exist_ok=True)
-    json.dump(results, open("artifacts/gate_c_results.json", "w"), indent=2)
+    out = {
+        "cleaning_stats": results,
+        "ks_tests": ks_results,
+        "gate_pass": any_pass,
+        "triggers": triggers,
+    }
+    json.dump(out, open("artifacts/gate_c_results.json", "w"), indent=2)
 
     print("\n" + "=" * 62)
     if any_pass:
-        print("GATE C: PASS -- cleaning has measurable effect on data.")
-        print("  Contribution 1 (interaction matrix) is defensible.")
+        print(f"GATE C: PASS -- cleaning has measurable effect on data.")
+        print(f"  Triggered by: {', '.join(triggers)}")
+        print("  Contribution 1 (cleaning ablation) is defensible.")
     else:
         print("GATE C: FAIL -- cleaning appears cosmetic.")
         print("  Action: strengthen the intervention OR demote C1.")
-        print("  See PILOT_PLAN.md §6-C for options.")
     print("=" * 62)
 
 

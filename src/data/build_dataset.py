@@ -35,12 +35,40 @@ from src.data.features import (FEATURES, bars_to_features, label_windows,
 RNG = np.random.default_rng(42)
 
 
-def load_symbol_ticks(raw_dir: str, pair: str) -> pd.DataFrame | None:
+def load_symbol_chunks(raw_dir: str, pair: str) -> list[pd.DataFrame]:
+    """Load a pair's raw ticks as a list of contiguous-calendar-day chunks.
+
+    Chunk boundaries come from the DOWNLOADED FILE LIST (daily parquet
+    filenames, e.g. 2020-04-07.parquet), not from gaps in trade timestamps.
+    A run of files stays in one chunk only while each date is exactly one
+    calendar day after the previous file's date; any gap >=2 days (including
+    a day that 404'd and was never downloaded) starts a new chunk.
+
+    This matters because a pair's downloaded days are event-centered clusters
+    (±days_before/after_event around each of the pair's pump events, plus
+    sparse normal-day samples) — NOT a continuous history. Concatenating all
+    of them and resampling in one shot (the old behaviour) bridges multi-day/
+    multi-month/multi-year gaps between clusters with millions of phantom
+    imputed empty bars. Building bars/features/windows independently per
+    chunk keeps rolling-window warmup (z_window, vol_window) from ever
+    crossing a real gap.
+    """
     files = sorted(glob.glob(os.path.join(raw_dir, pair, "*.parquet")))
     if not files:
-        return None
-    df = pd.concat([pd.read_parquet(f) for f in files], ignore_index=True)
-    return df
+        return []
+
+    dates = [pd.Timestamp(os.path.splitext(os.path.basename(f))[0])
+             for f in files]
+
+    chunks: list[list[str]] = [[files[0]]]
+    for prev_d, d, f in zip(dates, dates[1:], files[1:]):
+        if (d - prev_d).days == 1:
+            chunks[-1].append(f)
+        else:
+            chunks.append([f])
+
+    return [pd.concat([pd.read_parquet(f) for f in chunk], ignore_index=True)
+            for chunk in chunks]
 
 
 def _subsample_negatives(y: np.ndarray, keep_ratio: float,
@@ -76,79 +104,173 @@ def build_mode(cfg: dict, mode: str) -> None:
     t2 = labels["pump_time"].quantile(S["train_frac"] + S["val_frac"])
     print(f"[{mode}] split boundaries: train<= {t1}  val<= {t2}  test> {t2}")
 
-    Xs, ys, ends, prs, tags = [], [], [], [], []
     stats = {"ticks_in": 0, "removed": 0, "removed_in_pump": 0,
              "removed_in_normal": 0}
+    chunks_per_pair = []  # for reporting: n contiguous-day chunks per pair
 
-    for pair in tqdm(pairs, desc=f"[{mode}] symbols"):
-        raw = load_symbol_ticks(P["raw_dir"], pair)
-        if raw is None or len(raw) < 1000:
+    # ------------------------------------------------------------ PASS 1/2
+    # Label every window but do NOT retain X (float32 [N,120,10] is the
+    # memory-heavy part -- with ~2,000 downloaded pair-days at 5s bars and
+    # a 1-min stride, the full unsampled dataset is ~2.7M windows / ~12GB,
+    # which does not fit in RAM at once together with negative subsampling
+    # still to come). Only y/end_ns/tag survive this pass (cheap, int64).
+    # Cleaned per-chunk tick data IS cached for pass 2 -- the whole raw
+    # corpus is only ~150MB, trivial to hold in memory.
+    cleaned_cache: dict[str, list[pd.DataFrame]] = {}
+    pair_offsets: dict[str, tuple[int, int]] = {}
+    ys, ends, prs, tags = [], [], [], []
+    cursor = 0
+
+    for pair in tqdm(pairs, desc=f"[{mode}] pass 1/2 (label)"):
+        pair_chunks = load_symbol_chunks(P["raw_dir"], pair)
+        pair_chunks = [c for c in pair_chunks if len(c) >= 1000]
+        if not pair_chunks:
             continue
-
-        cleaned = clean_ticks(
-            raw, mode,
-            static_pct=C["static_pct"], k0=C["adaptive_k0"],
-            tick_sigma_window=C["tick_sigma_window"],
-            regime_clip=tuple(C["regime_clip"]),
-        )
-        st = cleaning_stats(raw, cleaned)
-        stats["ticks_in"] += st["ticks_in"]
-        stats["removed"] += st["removed"]
-
-        # GATE C evidence: were removed trades near pumps or in normal periods?
-        if st["removed"] > 0:
-            kept = set(cleaned["agg_id"].to_numpy())
-            removed = raw.loc[~raw["agg_id"].isin(kept)]
-            rem_ts = pd.to_datetime(removed["time"], unit="ms", utc=True)
-            ptimes = labels.loc[labels["pair"] == pair, "pump_time"]
-            near = np.zeros(len(rem_ts), dtype=bool)
-            for t in ptimes:
-                near |= np.asarray(
-                    (rem_ts >= t - pd.Timedelta(minutes=W["pre_minutes"])) &
-                    (rem_ts <= t + pd.Timedelta(minutes=W["during_minutes"])))
-            stats["removed_in_pump"] += int(near.sum())
-            stats["removed_in_normal"] += int((~near).sum())
-
-        bars = trades_to_bars(cleaned, B["bar_seconds"])
-        feats = bars_to_features(bars, B["z_window"], B["vol_window"])
-        X, end_ns = make_windows(feats, W["window_bars"], W["stride_bars"])
-        if len(X) == 0:
-            continue
+        chunks_per_pair.append(len(pair_chunks))
 
         ptimes = labels.loc[labels["pair"] == pair, "pump_time"]
-        y, mask_out = label_windows(
-            end_ns, ptimes,
-            pre_minutes=W["pre_minutes"],
-            during_minutes=W["during_minutes"],
-            buffer_hours=W["buffer_hours"],
-        )
-        X, y, end_ns = X[~mask_out], y[~mask_out], end_ns[~mask_out]
-        if len(X) == 0:
+
+        cleaned_chunks, pair_ys, pair_ends = [], [], []
+        for raw in pair_chunks:
+            # each contiguous-calendar-day chunk gets its own bars/features/
+            # windows pipeline so rolling warmup (z_window, vol_window) and
+            # the 5s-bar resample grid never bridge a real (multi-day+) gap
+            # between a pair's downloaded date clusters.
+            cleaned = clean_ticks(
+                raw, mode,
+                static_pct=C["static_pct"], k0=C["adaptive_k0"],
+                tick_sigma_window=C["tick_sigma_window"],
+                regime_clip=tuple(C["regime_clip"]),
+            )
+            st = cleaning_stats(raw, cleaned)
+            stats["ticks_in"] += st["ticks_in"]
+            stats["removed"] += st["removed"]
+
+            # GATE C evidence: were removed trades near pumps or in normal periods?
+            if st["removed"] > 0:
+                kept = set(cleaned["agg_id"].to_numpy())
+                removed = raw.loc[~raw["agg_id"].isin(kept)]
+                rem_ts = pd.to_datetime(removed["time"], unit="ms", utc=True)
+                near = np.zeros(len(rem_ts), dtype=bool)
+                for t in ptimes:
+                    near |= np.asarray(
+                        (rem_ts >= t - pd.Timedelta(minutes=W["pre_minutes"])) &
+                        (rem_ts <= t + pd.Timedelta(minutes=W["during_minutes"])))
+                stats["removed_in_pump"] += int(near.sum())
+                stats["removed_in_normal"] += int((~near).sum())
+
+            cleaned_chunks.append(cleaned)
+
+            bars = trades_to_bars(cleaned, B["bar_seconds"])
+            feats = bars_to_features(bars, B["z_window"], B["vol_window"])
+            X, end_ns = make_windows(feats, W["window_bars"], W["stride_bars"])
+            if len(X) == 0:
+                # expected for short chunks (e.g. a single low-activity
+                # normal-day) that don't reach window_bars=120 bars
+                continue
+
+            y, mask_out = label_windows(
+                end_ns, ptimes,
+                pre_minutes=W["pre_minutes"],
+                during_minutes=W["during_minutes"],
+                buffer_hours=W["buffer_hours"],
+            )
+            y, end_ns = y[~mask_out], end_ns[~mask_out]
+            if len(y) == 0:
+                continue
+
+            pair_ys.append(y); pair_ends.append(end_ns)
+            # X is deliberately dropped here -- pass 2 rebuilds it cheaply
+            # (from the cached cleaned ticks) only for rows that survive
+            # negative subsampling.
+
+        if not pair_ys:
             continue
+
+        y = np.concatenate(pair_ys); end_ns = np.concatenate(pair_ends)
+
+        cleaned_cache[pair] = cleaned_chunks
+        pair_offsets[pair] = (cursor, cursor + len(y))
+        cursor += len(y)
 
         ends_dt = pd.to_datetime(end_ns, utc=True)
         tag = np.where(ends_dt <= t1, "train",
                        np.where(ends_dt <= t2, "val", "test"))
 
-        Xs.append(X); ys.append(y); ends.append(end_ns)
+        ys.append(y); ends.append(end_ns)
         prs.append(np.full(len(y), pair)); tags.append(tag)
 
-    if not Xs:
+    if chunks_per_pair:
+        print(f"[{mode}] chunks/pair: mean={np.mean(chunks_per_pair):.1f}  "
+              f"max={max(chunks_per_pair)}  "
+              f"(from {len(chunks_per_pair)} pairs with usable data)")
+
+    if not ys:
         raise SystemExit(f"[{mode}] no windows produced — check downloads.")
 
-    X = np.concatenate(Xs); y = np.concatenate(ys)
-    end_ns = np.concatenate(ends); pair_arr = np.concatenate(prs)
-    tag = np.concatenate(tags)
+    y_all = np.concatenate(ys); end_ns_all = np.concatenate(ends)
+    pair_all = np.concatenate(prs); tag_all = np.concatenate(tags)
 
     rm_pct = 100 * stats["removed"] / max(stats["ticks_in"], 1)
     print(f"[{mode}] cleaning removed {stats['removed']:,} / "
           f"{stats['ticks_in']:,} trades ({rm_pct:.4f}%)")
+    print(f"[{mode}] total windows before neg subsampling: {len(y_all):,}")
 
-    keep = (_subsample_negatives(y, W["neg_ratio_train"], tag, "train")
-            & _subsample_negatives(y, W["neg_cap_eval"], tag, "val")
-            & _subsample_negatives(y, W["neg_cap_eval"], tag, "test"))
-    X, y, end_ns, pair_arr, tag = (a[keep] for a in
-                                   (X, y, end_ns, pair_arr, tag))
+    keep = (_subsample_negatives(y_all, W["neg_ratio_train"], tag_all, "train")
+            & _subsample_negatives(y_all, W["neg_cap_eval"], tag_all, "val")
+            & _subsample_negatives(y_all, W["neg_cap_eval"], tag_all, "test"))
+
+    # ------------------------------------------------------------ PASS 2/2
+    # Rebuild X per pair from the cached, already-cleaned ticks (cheap:
+    # bars/features/windows recompute only, no re-read/re-clean), then
+    # immediately keep only the rows selected by `keep` -- the full
+    # unsampled X for a pair (let alone the whole dataset) never has to
+    # coexist in memory with every other pair's X.
+    Xs, ys_k, ends_k, prs_k, tags_k = [], [], [], [], []
+    for pair in tqdm(pairs, desc=f"[{mode}] pass 2/2 (features)"):
+        if pair not in pair_offsets:
+            continue
+        start, stop = pair_offsets[pair]
+        pair_keep = keep[start:stop]
+        if not pair_keep.any():
+            continue
+
+        pair_Xs = []
+        for cleaned in cleaned_cache[pair]:
+            bars = trades_to_bars(cleaned, B["bar_seconds"])
+            feats = bars_to_features(bars, B["z_window"], B["vol_window"])
+            X, end_ns = make_windows(feats, W["window_bars"], W["stride_bars"])
+            if len(X) == 0:
+                continue
+            ptimes = labels.loc[labels["pair"] == pair, "pump_time"]
+            _, mask_out = label_windows(
+                end_ns, ptimes,
+                pre_minutes=W["pre_minutes"],
+                during_minutes=W["during_minutes"],
+                buffer_hours=W["buffer_hours"],
+            )
+            X = X[~mask_out]
+            if len(X) == 0:
+                continue
+            pair_Xs.append(X)
+
+        X = np.concatenate(pair_Xs)
+        assert len(X) == stop - start, (
+            f"[{mode}] pass1/pass2 row-count mismatch for {pair}: "
+            f"{len(X)} vs {stop - start} -- non-determinism in the pipeline?")
+        X = X[pair_keep]
+
+        Xs.append(X)
+        ys_k.append(y_all[start:stop][pair_keep])
+        ends_k.append(end_ns_all[start:stop][pair_keep])
+        prs_k.append(pair_all[start:stop][pair_keep])
+        tags_k.append(tag_all[start:stop][pair_keep])
+
+    del cleaned_cache
+
+    X = np.concatenate(Xs); y = np.concatenate(ys_k)
+    end_ns = np.concatenate(ends_k); pair_arr = np.concatenate(prs_k)
+    tag = np.concatenate(tags_k)
 
     out_dir = os.path.join(P["processed_dir"], mode)
     os.makedirs(out_dir, exist_ok=True)

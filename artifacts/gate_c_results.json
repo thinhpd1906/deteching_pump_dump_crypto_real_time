@@ -1,0 +1,49 @@
+{
+  "cleaning_stats": {
+    "none": {
+      "ticks_in": 9396143,
+      "removed": 0,
+      "removed_in_pump": 0,
+      "removed_in_normal": 0,
+      "removed_pct": 0.0
+    },
+    "static": {
+      "ticks_in": 9396143,
+      "removed": 23578,
+      "removed_in_pump": 14260,
+      "removed_in_normal": 9318,
+      "removed_pct": 0.2509,
+      "pump_frac": 0.6048010857579099,
+      "normal_frac": 0.3951989142420901,
+      "pump_normal_ratio": 1.5303713204461156
+    },
+    "adaptive": {
+      "ticks_in": 9396143,
+      "removed": 5597,
+      "removed_in_pump": 201,
+      "removed_in_normal": 5396,
+      "removed_pct": 0.0596,
+      "pump_frac": 0.03591209576558871,
+      "normal_frac": 0.9640879042344113,
+      "pump_normal_ratio": 0.037249814638901556
+    }
+  },
+  "ks_tests": {
+    "z_ret": {
+      "statistic": 0.00162,
+      "pvalue": 0.9999999226081013,
+      "n_none": 50000,
+      "n_adaptive": 50000
+    },
+    "z_vol": {
+      "statistic": 0.005539999999999989,
+      "pvalue": 0.4252530882663843,
+      "n_none": 50000,
+      "n_adaptive": 50000
+    }
+  },
+  "gate_pass": true,
+  "triggers": [
+    "differential_removal_adaptive"
+  ]
+}

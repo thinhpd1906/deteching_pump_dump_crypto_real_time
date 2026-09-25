@@ -1,0 +1,16 @@
+=== SELF-SUPERVISED PRETRAINING [adaptive] ===
+  unlabeled windows : 146,240
+  window / features : 120 x 10
+  params            : 152,214
+  device            : cpu   epochs: 1   seed: 42
+  mask ratio        : 0.25   lambda_k: 3.0
+  epoch 01/1  recon=0.379410  (4390.9s)
+
+  saved encoder -> artifacts\adaptive\at_pretrained.pt
+
+==============================================================
+PRETRAIN SANITY: mean anomaly score
+  positive (pump) windows : 8.909843
+  negative windows        : 0.051836
+  OK -- pretrained representation separates pumps unsupervised.
+==============================================================
