@@ -29,7 +29,7 @@ TABLE1_ROWS = [
     ("B5  Logistic Regression",        "b5_logreg"),
     ("B6  XGBoost",                    "b6_xgboost"),
     ("B7  LSTM-AE (unsupervised)",     "b7_lstmae"),
-    ("B8  CNN-BiLSTM (supervised)",    "b8_cnnbilstm"),        # also cnnbilstm_scratch
+    ("B8  CNN-BiLSTM (supervised)",    "cnnbilstm_scratch"),
     ("B9  AT from scratch",            "at_scratch"),
     ("B10 AT pretrained unsupervised", "b10_at_unsup"),
     ("D   OURS: AT pretrained+ftune",  "at_pre"),
@@ -40,10 +40,10 @@ CI_COLS     = ["f1_lo", "f1_hi"]
 
 
 def _read(art: str, tag: str) -> dict | None:
-    # try exact tag first, then startswith (covers seeds, fracs)
+    # try exact tag first, then seed runs (never label-fraction runs)
     for pattern in [
         os.path.join(art, f"{tag}_test.json"),
-        os.path.join(art, f"{tag}*_test.json"),
+        os.path.join(art, f"{tag}_s*_test.json"),
     ]:
         hits = sorted(glob.glob(pattern))
         if hits:
@@ -109,20 +109,32 @@ def print_table2(art_root: str, tag: str = "at_pre") -> None:
         print(f"{mode:<{w}} | {wrow} | {erow} | {ci}")
 
 
+def _seed_runs(art: str, tag: str) -> list[dict]:
+    """All seed runs of a full-label tag (tag_s0, tag_s1, ...)."""
+    return [json.load(open(h)) for h in
+            sorted(glob.glob(os.path.join(art, f"{tag}_s*_test.json")))]
+
+
 def gate3_check(art: str) -> None:
-    pre  = _read(art, "at_pre")
-    scr  = _read(art, "at_scratch")
-    cnn  = _read(art, "cnnbilstm_scratch") or _read(art, "cnnbilstm")
+    """Gate 3 on seed MEANS: at_pre mean F1 must clear at_scratch's mean
+    upper CI bound (symbol bootstrap), not just beat a single seed."""
+    pre, scr = _seed_runs(art, "at_pre"), _seed_runs(art, "at_scratch")
+    cnn = _seed_runs(art, "cnnbilstm_scratch")
+
+    def ms(runs, k):
+        v = [r[k] for r in runs if k in r]
+        return float(np.mean(v)), float(np.std(v))
 
     print("\n" + "=" * 62)
-    print("GATE 3 -- SELF-SUPERVISION CHECK")
+    print("GATE 3 -- SELF-SUPERVISION CHECK (full labels, mean over seeds)")
     if pre and scr:
-        f1p, f1s = pre.get("f1", 0), scr.get("f1", 0)
-        print(f"  at_pre    test F1 = {f1p:.4f}")
-        print(f"  at_scratch test F1 = {f1s:.4f}")
-        # Check if gap is outside bootstrap CIs
-        p_lo = pre.get("f1_lo", f1p)
-        s_hi = scr.get("f1_hi", f1s)
+        (f1p, sdp), (f1s, sds) = ms(pre, "f1"), ms(scr, "f1")
+        s_hi, _ = ms(scr, "f1_hi")
+        print(f"  at_pre     test F1 = {f1p:.4f} ± {sdp:.4f}  (n={len(pre)} seeds)")
+        print(f"  at_scratch test F1 = {f1s:.4f} ± {sds:.4f}  (n={len(scr)} seeds)"
+              f"  mean CI upper = {s_hi:.4f}")
+        if min(len(pre), len(scr)) < 3:
+            print("  (fewer than 3 seeds each -- provisional)")
         if f1p > f1s:
             print(f"  at_pre > at_scratch by {f1p - f1s:.4f}")
             if f1p > s_hi:
@@ -130,14 +142,14 @@ def gate3_check(art: str) -> None:
             else:
                 print("  GATE 3: MARGINAL -- check label-efficiency at 10% labels.")
         else:
-            print(f"  GATE 3: FAIL -- pretraining did not improve over random init.")
+            print("  GATE 3: FAIL -- pretraining did not improve over random init.")
             print("  Action: check label_efficiency.py at 10% labels before deciding.")
     else:
         print("  Missing results. Run finetune for at_pre and at_scratch first.")
 
     if pre and cnn:
-        f1p, f1c = pre.get("f1", 0), cnn.get("f1", 0)
-        print(f"  OURS vs CNN-BiLSTM: {f1p:.4f} vs {f1c:.4f} "
+        (f1p, _), (f1c, sdc) = ms(pre, "f1"), ms(cnn, "f1")
+        print(f"  OURS vs CNN-BiLSTM: {f1p:.4f} vs {f1c:.4f} ± {sdc:.4f} "
               f"({'OURS wins' if f1p > f1c else 'CNN wins/ties'})")
     print("=" * 62)
 

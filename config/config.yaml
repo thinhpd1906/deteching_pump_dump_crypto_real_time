@@ -57,6 +57,7 @@ train:
   patience: 6
   pos_class_weight: auto
   seed: 42
+  amp: true             # fp16 autocast on GPU (T4 ~2x); ignored on CPU
 
 pipeline:
   kafka_bootstrap: localhost:9092

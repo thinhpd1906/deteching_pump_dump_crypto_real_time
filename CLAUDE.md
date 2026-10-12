@@ -9,7 +9,7 @@ Style: Direct answers preferred. Complete working code over snippets.
 Machine: Windows, VS Code + Claude Code CLI
 Project folder: C:\Users\phant\Desktop\pnd-thesis-agents\
 Virtual env: .venv\Scripts\python.exe — always activate before running Python
-GitHub: github.com/thinhpd1906/detecting_pump_dump_crypto_real_time
+GitHub: github.com/thinhpd1906/deteching_pump_dump_crypto_real_time
 Supervisor: GCN/anomaly detection on behavioral graphs (ACIIDS 2023, RIVF 2021)
 2. THESIS IDENTITY
 
@@ -115,6 +115,8 @@ Gate1 filter bug: was filtering by pair not specific labeled dates → bogus 1/4
 OOM on large pairs: ARNBTC 1.1M windows → chunk by consecutive calendar days
 Full dataset memory: 2.75M windows / 12.3GB → two-pass label-then-rebuild
 Labels overlap across sources: dedupe on (pair, |Δt|<30min) when merging La Morgia + ArdiaD + Fantazzini
+Label-efficiency sampled WINDOWS not EVENTS (fixed 2026-10-12): 10% of windows still covered 225/225 train events (~65 overlapping pos windows/event) → not real scarcity. subsample_labels now samples by event (10% = 22 events). Never revert.
+Kaggle notebook Step 3 extracted zip to ./processed instead of data/processed (fixed 2026-10-12, now globs /kaggle/input). Notebook also lacked eval_unsupervised (B7/B10) — added as Step 5b.
 9. EVALUATION PROTOCOL (state this explicitly in the paper)
 Chronological split by global pump-time quantiles — NEVER shuffle
 Threshold tuned on VALIDATION F1 (grid search) — never 0.5, never test
@@ -183,6 +185,7 @@ Do NOT use bullet points when explaining to user — use prose
 [✓] Week 4: Microstructure baselines (OFI/VPIN/Amihud) — done as B3 during Week 3's baseline run
 [✓] Week 5: Model implementation + pretrain — pretrain complete, 347x unsupervised separation (see Section 6 Part E)
 [→] Week 6-7: Fine-tuning on Kaggle GPU (at_pre, at_scratch, cnnbilstm × 3 seeds each) + unsupervised eval (B7, B10) + label-efficiency + Gate 3
+    First single-session attempt needed >8h → reworked (2026-10-12) into a resumable multi-session queue: scripts/kaggle_queue.py runs 37 jobs in priority order (Gate 3 core first), skips any job whose {tag}_test.json exists, finetune saves {tag}_last.pt every epoch and exits 75 before the deadline. Chain sessions by attaching the previous notebook version's output as input (Step 5 --restore). Speed-ups: GPU-resident batches, fp16 AMP (train.amp), 2 parallel jobs on T4 x2, vectorised threshold tuning (verified identical to sklearn), label-efficiency 100% point reuses main fine-tune runs instead of retraining.
 [ ] Week 8: Tables + figures + 4-page draft → GO/PIVOT decision
 17. SESSION START CHECKLIST
 Run /status to see current state

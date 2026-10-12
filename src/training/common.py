@@ -41,22 +41,41 @@ def load_pretrain_pool(data_dir: str) -> np.ndarray:
     return (X - mean) / std
 
 
-def subsample_labels(X, y, frac: float, seed: int = 0):
-    """Keep `frac` of the POSITIVE EVENTS' windows (label-efficiency study).
+def group_events(y, end_ns, pair, gap_ns: int) -> np.ndarray:
+    """Event id per positive window (-1 for negatives).
 
-    Negatives are kept in proportion so the class ratio stays constant.
+    Positive windows of one pump are contiguous in time on one pair; a new
+    event starts when the pair changes or the time gap exceeds `gap_ns`.
+    """
+    ev = np.full(len(y), -1, dtype=np.int64)
+    pos = np.where(y == 1)[0]
+    if len(pos) == 0:
+        return ev
+    pos = pos[np.lexsort((end_ns[pos], pair[pos]))]
+    new = np.r_[True, (pair[pos][1:] != pair[pos][:-1])
+                | (np.diff(end_ns[pos]) > gap_ns)]
+    ev[pos] = np.cumsum(new) - 1
+    return ev
+
+
+def subsample_labels(X, y, frac: float, seed: int, end_ns, pair, gap_ns: int):
+    """Keep `frac` of the POSITIVE EVENTS (label-efficiency study).
+
+    Sampling is by EVENT, not by window: each pump yields ~65 overlapping
+    positive windows, so window-level sampling at 10% still exposes the model
+    to every training event and is not real label scarcity.
+    Negatives are kept in proportion so the class ratio stays roughly constant.
     """
     if frac >= 1.0:
         return X, y
     rng = np.random.default_rng(seed)
-    pos = np.where(y == 1)[0]
+    ev = group_events(y, end_ns, pair, gap_ns)
+    n_ev = int(ev.max()) + 1
+    kept_ev = rng.choice(n_ev, max(int(round(n_ev * frac)), 1), replace=False)
+    pos = np.where(np.isin(ev, kept_ev))[0]
     neg = np.where(y == 0)[0]
-    n_pos = max(int(len(pos) * frac), 1)
     n_neg = max(int(len(neg) * frac), 1)
-    keep = np.concatenate([
-        rng.choice(pos, n_pos, replace=False),
-        rng.choice(neg, n_neg, replace=False),
-    ])
+    keep = np.concatenate([pos, rng.choice(neg, n_neg, replace=False)])
     rng.shuffle(keep)
     return X[keep], y[keep]
 
@@ -64,13 +83,20 @@ def subsample_labels(X, y, frac: float, seed: int = 0):
 # --------------------------------------------------------------- thresholds
 def tune_threshold(y_true, scores, grid: int = 300):
     """Pick the decision threshold maximizing F1 on VALIDATION. Never 0.5."""
+    # Vectorised (same grid and same F1 as sklearn's f1_score with
+    # zero_division=0): count TP/FP per threshold via sorted scores.
     lo, hi = np.percentile(scores, 0.5), np.percentile(scores, 99.9)
-    best_t, best_f1 = float(lo), -1.0
-    for t in np.linspace(lo, hi, grid):
-        f1 = f1_score(y_true, scores >= t, zero_division=0)
-        if f1 > best_f1:
-            best_f1, best_t = f1, float(t)
-    return best_t, float(best_f1)
+    ts = np.linspace(lo, hi, grid)
+    y = np.asarray(y_true).astype(bool)
+    pos_s = np.sort(scores[y])
+    neg_s = np.sort(scores[~y])
+    tp = len(pos_s) - np.searchsorted(pos_s, ts, side="left")   # scores >= t
+    fp = len(neg_s) - np.searchsorted(neg_s, ts, side="left")
+    fn = len(pos_s) - tp
+    denom = 2 * tp + fp + fn
+    f1 = np.where(denom > 0, 2 * tp / np.maximum(denom, 1), 0.0)
+    i = int(np.argmax(f1))                       # first max, like the old loop
+    return float(ts[i]), float(f1[i])
 
 
 # ------------------------------------------------------------------ metrics
