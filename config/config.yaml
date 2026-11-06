@@ -75,6 +75,15 @@ pipeline:
   topic_alerts: alerts
   live_symbols: [BTCUSDT, ETHUSDT]
   alert_threshold: null   # null = use threshold from saved checkpoint
+  bar_grace_ms: 1000      # quiet symbol: close a bar this long after its end (local clock)
+  latency:                # A5, scripts/measure_latency.py
+    hours: 3.0            # >= 2 h required; first ~65 min is feature warm-up
+    model: at_pre_lf10_s0 # same architecture as the frozen model; re-measure after freeze
+    device: cpu           # MPS is busy with the A4 search; CPU is the conservative case
+    symbols: [BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, XRPUSDT, DOGEUSDT, ADAUSDT,
+              TRXUSDT, LINKUSDT, AVAXUSDT, LTCUSDT, DOTUSDT, BCHUSDT, ATOMUSDT,
+              ETCUSDT, FILUSDT, NEARUSDT, APTUSDT, ARBUSDT, OPUSDT]
+    ntp_server: time.apple.com
 
 # ------------------------------------------------------------------
 # A4: time-boxed fair hyper-parameter search (VAL ONLY, never test).
