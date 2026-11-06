@@ -78,14 +78,30 @@ EOF
 
 step "5. Kaggle credentials"
 mkdir -p "$HOME/.kaggle"
-if [[ ! -s "$HOME/.kaggle/kaggle.json" ]]; then
-  echo "Paste the full contents of kaggle.json (Windows: C:\\Users\\phant\\.kaggle\\kaggle.json,"
-  echo "or kaggle.com -> Settings -> API -> Create New Token), then press Enter:"
-  read -r KJSON
-  printf '%s\n' "$KJSON" > "$HOME/.kaggle/kaggle.json"
+# Accepted: new-style API token (~/.kaggle/access_token, shown once on kaggle.com),
+# OAuth login (~/.kaggle/credentials.json), or a legacy kaggle.json.
+kaggle_ok() { kaggle datasets files phancthnh/pnd-thesis-checkpoint >/dev/null 2>&1; }
+if kaggle_ok; then
+  ok "Kaggle credentials work"
+else
+  for attempt in 1 2 3; do
+    echo "Kaggle login needed. On this Mac: kaggle.com -> Settings -> API -> Create New Token."
+    echo "Copy the token it shows (or the contents of a downloaded kaggle.json),"
+    echo "paste it here (Cmd+V) and press Enter:"
+    read -r KTOK
+    KTOK="$(printf '%s' "$KTOK" | tr -d '[:space:]')"
+    [[ -z "$KTOK" ]] && continue
+    if [[ "$KTOK" == \{* ]]; then
+      printf '%s\n' "$KTOK" > "$HOME/.kaggle/kaggle.json"; chmod 600 "$HOME/.kaggle/kaggle.json"
+    else
+      printf '%s' "$KTOK" > "$HOME/.kaggle/access_token"; chmod 600 "$HOME/.kaggle/access_token"
+    fi
+    if kaggle_ok; then break; fi
+    warn "Kaggle rejected that credential, try again."
+  done
+  kaggle_ok || { echo "Kaggle login failed 3 times. Fix it, then re-run this script."; exit 1; }
+  ok "Kaggle credentials work"
 fi
-chmod 600 "$HOME/.kaggle/kaggle.json"
-ok "kaggle.json present"
 
 step "6. Data (gitignored) -> Kaggle datasets + raw tarball"
 mkdir -p "$DL_DIR" artifacts/adaptive data
