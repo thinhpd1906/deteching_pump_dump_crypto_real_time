@@ -97,8 +97,15 @@ class BarAggregator:
     def add(self, t: dict) -> list[dict]:
         sym = t["s"]
         out = []
-        for c in self.cleaners[sym].push(t):
+        cl = self.cleaners[sym]
+        for c in cl.push(t):
             out += self._add_clean(sym, c)
+        # the held tick already belongs to a later bar: every tick of the open
+        # bar has been decided, so close it now instead of waiting for grace
+        pt = cl.pending_time
+        if self.buf[sym] and pt is not None and \
+                pt >= self.start[sym] + self.bar_ms:
+            out += self._close(sym)
         return out
 
     def due(self, now_exchange_ms: int) -> list[dict]:
