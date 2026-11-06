@@ -1,0 +1,45 @@
+/Users/elvisle/pnd-thesis/scripts/verify_parity.py:152: DeprecationWarning: value_deserializer does not implement kafka.serializer.Deserializer
+  c = KafkaConsumer(P["topic_raw"], bootstrap_servers=P["kafka_bootstrap"],
+=== SCALER / FEATURE PARITY CHECK (live trades replayed from Kafka) ===
+BTCUSDT    none     trades= 127062 removed off/on=0/0 path windows= 1491 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+BTCUSDT    adaptive trades= 127062 removed off/on=23/29 path windows= 1491 max|diff|=0.0e+00 | clean P/R=0.79/1.00 skew windows=47.3%  PASS
+ETHUSDT    none     trades=  98506 removed off/on=0/0 path windows= 1480 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+ETHUSDT    adaptive trades=  98506 removed off/on=12/11 path windows= 1480 max|diff|=0.0e+00 | clean P/R=1.00/0.92 skew windows=4.3%  PASS
+BNBUSDT    none     trades=  38626 removed off/on=0/0 path windows= 1488 max|diff|=3.5e-10 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+BNBUSDT    adaptive trades=  38626 removed off/on=2/2 path windows= 1488 max|diff|=3.5e-10 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+SOLUSDT    none     trades=  13379 removed off/on=0/0 path windows= 1450 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+SOLUSDT    adaptive trades=  13379 removed off/on=0/0 path windows= 1450 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+XRPUSDT    none     trades=  16028 removed off/on=0/0 path windows= 1427 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+XRPUSDT    adaptive trades=  16028 removed off/on=0/0 path windows= 1427 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+DOGEUSDT   none     trades=   7878 removed off/on=0/0 path windows= 1273 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+DOGEUSDT   adaptive trades=   7878 removed off/on=0/0 path windows= 1273 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+ADAUSDT    none     trades=   3079 removed off/on=0/0 path windows=  883 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+ADAUSDT    adaptive trades=   3079 removed off/on=0/0 path windows=  883 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+TRXUSDT    none     trades=   7372 removed off/on=0/0 path windows= 1372 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+TRXUSDT    adaptive trades=   7372 removed off/on=14/10 path windows= 1372 max|diff|=0.0e+00 | clean P/R=1.00/0.71 skew windows=26.0%  PASS
+LINKUSDT   none     trades=   5896 removed off/on=0/0 path windows= 1006 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+LINKUSDT   adaptive trades=   5896 removed off/on=0/0 path windows= 1006 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+AVAXUSDT   none     trades=   4208 removed off/on=0/0 path windows=  870 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+AVAXUSDT   adaptive trades=   4208 removed off/on=0/0 path windows=  870 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+LTCUSDT    none     trades=   3957 removed off/on=0/0 path windows= 1102 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+LTCUSDT    adaptive trades=   3957 removed off/on=0/0 path windows= 1102 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+DOTUSDT    none     trades=    816 removed off/on=0/0 path windows=  273 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+DOTUSDT    adaptive trades=    816 removed off/on=0/0 path windows=  273 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+BCHUSDT    none     trades=   4655 removed off/on=0/0 path windows=  827 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+BCHUSDT    adaptive trades=   4655 removed off/on=0/0 path windows=  827 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+ATOMUSDT   none     trades=    660 removed off/on=0/0 path windows=  235 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+ATOMUSDT   adaptive trades=    660 removed off/on=0/0 path windows=  235 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+ETCUSDT    none     trades=    340 removed off/on=0/0 path windows=  132 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+ETCUSDT    adaptive trades=    340 removed off/on=0/0 path windows=  132 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+FILUSDT    none     trades=   3154 removed off/on=0/0 path windows=  723 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+FILUSDT    adaptive trades=   3154 removed off/on=0/0 path windows=  723 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+NEARUSDT   none     trades=  12571 removed off/on=0/0 path windows= 1302 max|diff|=4.7e-10 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+NEARUSDT   adaptive trades=  12571 removed off/on=12/10 path windows= 1302 max|diff|=0.0e+00 | clean P/R=0.90/0.75 skew windows=66.4%  PASS
+APTUSDT    none     trades=   3507 removed off/on=0/0 path windows=  528 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+APTUSDT    adaptive trades=   3507 removed off/on=0/0 path windows=  528 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+ARBUSDT    none     trades=   4608 removed off/on=0/0 path windows= 1007 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+ARBUSDT    adaptive trades=   4608 removed off/on=0/0 path windows= 1007 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+OPUSDT     none     trades=    740 removed off/on=0/0 path windows=  270 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+OPUSDT     adaptive trades=    740 removed off/on=0/0 path windows=  270 max|diff|=0.0e+00 | clean P/R=1.00/1.00 skew windows=0.0%  PASS
+
+VERDICT: PASS (40 symbol/mode runs with windows)
