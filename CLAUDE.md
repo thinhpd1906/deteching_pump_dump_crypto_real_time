@@ -42,8 +42,10 @@ Serving: `src/pipeline/inference_service.py` imports `bars_to_features`/`normali
 Name: Bryan (Phan Đức Thịnh) — Master's student at HUST + Android dev at Viettel (TV360)
 Language: English for technical work, Vietnamese OK for casual explanation (Bryan often writes in Vietnamese; answer in Vietnamese when he does)
 Style: Direct answers preferred. Complete working code over snippets. Explain in prose, not bullet lists. Be honest about weak results and academic risks.
-PRIMARY MACHINE (since 2026-11-06): Mac mini M4 Pro, Claude Code CLI. Project folder: ~/pnd-thesis. Venv: `source .venv/bin/activate` (always before Python). Set `PYTORCH_ENABLE_MPS_FALLBACK=1`. Long jobs run inside tmux session `thesis`.
-Old machine (being retired): Windows laptop, C:\Users\phant\Desktop\pnd-thesis-agents\, venv .venv\Scripts\python.exe. Windows-only paths elsewhere in this file refer to that machine.
+TWO MACHINES, BOTH IN ACTIVE USE (since 2026-11-06). Bryan works with Claude Code on either one; both must understand the full project from this file.
+Mac mini M4 Pro: project folder ~/pnd-thesis, venv `source .venv/bin/activate`, set `PYTORCH_ENABLE_MPS_FALLBACK=1`, long/unattended jobs (training, search, latency, later 24/7 automation) run here inside tmux session `thesis`.
+Windows laptop: project folder C:\Users\phant\Desktop\pnd-thesis-agents\, venv .venv\Scripts\python.exe (PowerShell: .venv\Scripts\Activate.ps1). Used for coding, review, writing, Kaggle notebook work.
+Sync rules between the two: git is the only channel. `git pull` at the start of every session, commit + push at the end. The Mac's unattended work goes to branch `mac/phase-a` (later `auto/<date>`); Bryan merges into `main`. Result JSONs and logs are committed so both machines see them; data and `*.pt` are not in git, so they move via the Kaggle datasets or scp, and `python scripts/make_data_manifest.py --verify` confirms both machines hold identical data. Claude's local memory does NOT sync between machines: anything a future session on either machine must know goes into this file (Section 20 for current state).
 GPU: Apple MPS on the Mac (code needs task A1 to use it), Kaggle T4 x2 for heavy runs.
 Commits: author thinhpd only. NEVER add a Co-Authored-By line or any Claude/AI attribution.
 GitHub: github.com/thinhpd1906/deteching_pump_dump_crypto_real_time
@@ -328,9 +330,9 @@ B9 Report + slides only after the final human checkpoint (@report-agent, @slide-
 B10 If Mac training is slow: Kaggle CLI `kernels push/status/output` to chain GPU sessions within the weekly quota.
 Before trusting Phase B: pull the power cable during a fine-tune; the Mac must come back, resume from the last epoch and notify Bryan with nobody touching it.
 
-## 20. HANDOFF STATE (last updated 2026-11-06, end of the last Windows session)
+## 20. HANDOFF STATE (last updated 2026-11-06 from the Windows machine; whichever machine works next updates this section)
 
-Where we are: Week 6–7. Bryan is moving fully to the Mac mini and will work with Claude Code there. Gates: G1 PASS, GC PASS, G2 FAIL (overridden, §5), G3 fails at 100% labels; the decisive 10%-label check is still pending.
+Where we are: Week 6–7. Bryan has added the Mac mini as a second machine and uses Claude Code on both (Mac for long-running work, Windows too). Gates: G1 PASS, GC PASS, G2 FAIL (overridden, §5), G3 fails at 100% labels; the decisive 10%-label check is still pending.
 
 What the planning sessions decided (all of it is in Sections 2, 19):
 The goal is an ACCEPTED paper before the June 2027 defense. Primary venue is IEEE ICBC 2027 (submit 3 Dec 2026, decision 19 Feb 2027). Backup venues are used sequentially after a rejection, never in parallel (dual submission is forbidden). Before the deadline the priority is the paper, not automation infrastructure: Phase A of §19 now, Phase B (24/7 orchestrator, launchd, Telegram, literature fetch, report/slides) after the submission.
@@ -338,7 +340,7 @@ The research loop may retrain with new methods/hyperparameters as often as neede
 "Paper-ready" means one condition per claim: C1 Gate C (done); C2 at 10% labels at_pre beats at_scratch outside seed noise (paired symbol bootstrap); the headline model is at least as good as the best classical baseline (LogReg); C3 p95 bar-close→alert latency < 5 s measured live; the protocol rules in §9. Fallback if C2 fails: a C1+C3-led systems paper with SSL reported honestly as a negative/mixed result.
 
 Mac setup status: `scripts/mac/bootstrap.sh` (one command, §19.1) ran on the Mac through step 4 (venv OK, torch 2.15.0, MPS available). It stopped at step 5 (Kaggle credentials): Kaggle now shows a token on screen instead of downloading kaggle.json; the script was fixed (commit 49dc22a8) to accept a pasted token and verify login. Next: re-run the bootstrap, paste the token, let it download data and verify the manifest.
-Raw data (`data/raw`, 154 MB) is NOT on Kaggle or GitHub. It exists as `C:\Users\phant\Desktop\pnd-raw.tgz` on the Windows laptop; copy it to `~/pnd-dl/` on the Mac before retiring Windows. Training does not need it; dataset rebuilds and Gate 1 do.
+Raw data (`data/raw`, 154 MB) is NOT on Kaggle or GitHub. It exists as `C:\Users\phant\Desktop\pnd-raw.tgz` on the Windows laptop; copy it to `~/pnd-dl/` on the Mac (scp over Tailscale, USB, or Drive) so both machines have it. Training does not need it; dataset rebuilds and Gate 1 do.
 Kaggle auth on Windows uses the new OAuth style (~/.kaggle/credentials.json + access_token), not kaggle.json.
 
 Open items for Bryan:
