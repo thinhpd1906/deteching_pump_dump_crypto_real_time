@@ -1,14 +1,14 @@
 # A4 search leaderboard (VALIDATION F1 only, test never used)
 
-Updated 2026-11-07T00:20. Budget 30 trials/arm, stop_at 2026-11-23T23:59:00+07:00.
+Updated 2026-11-07T04:18. Budget 30 trials/arm, stop_at 2026-11-23T23:59:00+07:00.
 
 Target: beat `b5_logreg` val F1 = 0.1696 by margin = seed_std.
 
 | arm | trials done | failed | best seed-0 val F1 | proposed config (top by 3-seed mean) | 3-seed val F1 | beats target |
 |---|---|---|---|---|---|---|
 | at_pre | 12 | 0 | 0.1945 | (confirm phase pending) |  |  |
-| at_scratch | 11 | 0 | 0.1885 | (confirm phase pending) |  |  |
-| cnnbilstm | 11 | 0 | 0.1782 | (confirm phase pending) |  |  |
+| at_scratch | 24 | 0 | 0.1897 | (confirm phase pending) |  |  |
+| cnnbilstm | 14 | 0 | 0.1782 | (confirm phase pending) |  |  |
 
 ## at_pre: top 10 trials
 
@@ -29,16 +29,16 @@ Target: beat `b5_logreg` val F1 = 0.1696 by margin = seed_std.
 
 | trial | val F1 | params |
 |---|---|---|
+| 13 | 0.1897 | `{'train.lr': 4.7446855437968263e-05, 'train.weight_decay': 0.08909944882166042, 'train.batch_size': 64, 'train.patience': 10, 'train.pos_weight_scale': 2.310010424384453, 'train.label_smoothing': 0.046435191239550186, 'dropout': 0.237079276275306}` |
+| 21 | 0.1889 | `{'train.lr': 2.4595196042086015e-05, 'train.weight_decay': 0.08344314613640477, 'train.batch_size': 64, 'train.patience': 10, 'train.pos_weight_scale': 1.9614453623917354, 'train.label_smoothing': 0.07418575131334817, 'dropout': 0.08804315772666543}` |
 | 7 | 0.1885 | `{'train.lr': 3.4662172842139684e-05, 'train.weight_decay': 0.04871454545414109, 'train.batch_size': 64, 'train.patience': 6, 'train.pos_weight_scale': 1.2427692563092039, 'train.label_smoothing': 0.04081368027612812, 'dropout': 0.07110809407290831}` |
+| 16 | 0.1885 | `{'train.lr': 3.548113519247008e-05, 'train.weight_decay': 0.06623783692338954, 'train.batch_size': 64, 'train.patience': 10, 'train.pos_weight_scale': 1.9981610687452656, 'train.label_smoothing': 0.028437511133420974, 'dropout': 0.06554265399128234}` |
 | 1 | 0.1875 | `{'train.lr': 2.56392017331631e-05, 'train.weight_decay': 0.043087600478391316, 'train.batch_size': 64, 'train.patience': 10, 'train.pos_weight_scale': 3.663052308384009, 'train.label_smoothing': 0.031342417815924284, 'dropout': 0.20769678470079422}` |
+| 19 | 0.1874 | `{'train.lr': 5.348514742259482e-05, 'train.weight_decay': 0.03849763890596805, 'train.batch_size': 64, 'train.patience': 10, 'train.pos_weight_scale': 2.2080115230072535, 'train.label_smoothing': 0.02975107005824513, 'dropout': 0.14691180495685752}` |
 | 0 | 0.1864 | `{'train.lr': 6.82407842709883e-05, 'train.weight_decay': 0.01448683388723935, 'train.batch_size': 64, 'train.patience': 10, 'train.pos_weight_scale': 1.1136276491758386, 'train.label_smoothing': 0.041919451440329485, 'dropout': 0.20556585011902784}` |
-| 5 | 0.1836 | `{'train.lr': 1.6020234085819775e-05, 'train.weight_decay': 0.0017464974804939173, 'train.batch_size': 32, 'train.patience': 10, 'train.pos_weight_scale': 1.2712256694844093, 'train.label_smoothing': 0.09034019152878836, 'dropout': 0.041242411243871256}` |
-| 6 | 0.1834 | `{'train.lr': 1.8991212552913992e-05, 'train.weight_decay': 0.026434668351371083, 'train.batch_size': 128, 'train.patience': 10, 'train.pos_weight_scale': 1.4090168145713897, 'train.label_smoothing': 0.07509424340273373, 'dropout': 0.10466950259335275}` |
-| 4 | 0.1789 | `{'train.lr': 3.763142612534594e-05, 'train.weight_decay': 0.00024551934474363233, 'train.batch_size': 64, 'train.patience': 10, 'train.pos_weight_scale': 0.37550767479985014, 'train.label_smoothing': 0.05893055369032843, 'dropout': 0.20992750800627935}` |
-| 9 | 0.1781 | `{'train.lr': 0.00024087616882457203, 'train.weight_decay': 0.09816768541009782, 'train.batch_size': 128, 'train.patience': 6, 'train.pos_weight_scale': 3.2312629160180553, 'train.label_smoothing': 0.07115247586284718, 'dropout': 0.037281288591649406}` |
-| 3 | 0.1773 | `{'train.lr': 0.00023604883174756995, 'train.weight_decay': 0.03190634197513423, 'train.batch_size': 128, 'train.patience': 6, 'train.pos_weight_scale': 0.865481030772183, 'train.label_smoothing': 0.09085955030930956, 'dropout': 0.08808424451210385}` |
-| 8 | 0.1754 | `{'train.lr': 0.0006408539140313453, 'train.weight_decay': 0.005260638512072054, 'train.batch_size': 64, 'train.patience': 10, 'train.pos_weight_scale': 1.4077981186548572, 'train.label_smoothing': 0.0015821242846556284, 'dropout': 0.27883117012312836}` |
-| 2 | 0.1748 | `{'train.lr': 0.0005659503131926907, 'train.weight_decay': 0.04828586218554464, 'train.batch_size': 256, 'train.patience': 10, 'train.pos_weight_scale': 1.0963140561774434, 'train.label_smoothing': 0.06918771139504734, 'dropout': 0.09465468930181888}` |
+| 14 | 0.1864 | `{'train.lr': 4.845688501721154e-05, 'train.weight_decay': 0.05040816527041978, 'train.batch_size': 64, 'train.patience': 6, 'train.pos_weight_scale': 0.9675349051299799, 'train.label_smoothing': 0.015149794691120218, 'dropout': 0.07400417421920782}` |
+| 15 | 0.1863 | `{'train.lr': 5.471532664978625e-05, 'train.weight_decay': 0.01919956156873423, 'train.batch_size': 64, 'train.patience': 6, 'train.pos_weight_scale': 2.002470008769155, 'train.label_smoothing': 0.01039251095790384, 'dropout': 0.2844166037438788}` |
+| 22 | 0.1851 | `{'train.lr': 1.5575371550763645e-05, 'train.weight_decay': 0.07229773115988293, 'train.batch_size': 64, 'train.patience': 10, 'train.pos_weight_scale': 1.7992072945018427, 'train.label_smoothing': 0.054546193109025864, 'dropout': 0.016562899396265943}` |
 
 ## cnnbilstm: top 10 trials
 
@@ -51,6 +51,6 @@ Target: beat `b5_logreg` val F1 = 0.1696 by margin = seed_std.
 | 9 | 0.1749 | `{'train.lr': 0.00015281611527743648, 'train.weight_decay': 0.0010932355063534291, 'train.batch_size': 64, 'train.patience': 6, 'train.pos_weight_scale': 0.40805871124174037, 'train.label_smoothing': 0.059125735265354584, 'dropout': 0.14677985009845773}` |
 | 7 | 0.1741 | `{'train.lr': 9.866147353327376e-05, 'train.weight_decay': 0.0017567805401718767, 'train.batch_size': 128, 'train.patience': 10, 'train.pos_weight_scale': 1.5476181469425645, 'train.label_smoothing': 0.021463574639995365, 'dropout': 0.12502603205860113}` |
 | 1 | 0.1733 | `{'train.lr': 1.8584885538668354e-05, 'train.weight_decay': 0.003473236559598501, 'train.batch_size': 128, 'train.patience': 4, 'train.pos_weight_scale': 0.2996075775780364, 'train.label_smoothing': 0.042812232759738944, 'dropout': 0.028959274698183768}` |
+| 11 | 0.1733 | `{'train.lr': 0.0007445914989176157, 'train.weight_decay': 0.0005544936016622726, 'train.batch_size': 128, 'train.patience': 4, 'train.pos_weight_scale': 0.3373688489188721, 'train.label_smoothing': 0.054850534666393086, 'dropout': 0.05405764397578399}` |
 | 5 | 0.1724 | `{'train.lr': 0.000398581100804794, 'train.weight_decay': 0.006389271811451123, 'train.batch_size': 32, 'train.patience': 10, 'train.pos_weight_scale': 0.8499322069468666, 'train.label_smoothing': 0.050400043937915265, 'dropout': 0.09706239526040965}` |
 | 8 | 0.1723 | `{'train.lr': 0.0001939473581738875, 'train.weight_decay': 0.009648148518478433, 'train.batch_size': 64, 'train.patience': 4, 'train.pos_weight_scale': 1.1276981248887328, 'train.label_smoothing': 0.02208379150614619, 'dropout': 0.27553759397688016}` |
-| 10 | 0.1711 | `{'train.lr': 5.0986615275594074e-05, 'train.weight_decay': 0.020888471322779698, 'train.batch_size': 128, 'train.patience': 4, 'train.pos_weight_scale': 0.6614747644667202, 'train.label_smoothing': 0.07583740466397917, 'dropout': 0.18803240989508072}` |
