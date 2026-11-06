@@ -1,0 +1,18 @@
+{
+  "tag": "at_pre_s2",
+  "precision": 0.2176,
+  "recall": 0.1577,
+  "f1": 0.1828,
+  "roc_auc": 0.7284,
+  "pr_auc": 0.1516,
+  "event_recall": 1.0,
+  "events_detected": 50,
+  "events_total": 50,
+  "fa_per_symbol_day": 6.85,
+  "f1_lo": 0.1458,
+  "f1_hi": 0.2198,
+  "thr": 0.833164,
+  "val_f1": 0.1951,
+  "label_frac": 1.0,
+  "seed": 2
+}
