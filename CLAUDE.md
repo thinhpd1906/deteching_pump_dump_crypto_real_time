@@ -268,7 +268,7 @@ Daily access from Windows: `ssh <user>@<mac-tailscale-name>` then `tmux attach -
 5. Reuse, don't redo: labels, raw, processed datasets, split and scaler are built once. Pretraining re-runs only when a trial changes pretraining.
 6. Numbers in paper/report/slides come from scripts reading artifact JSONs. Citations come from arXiv / Semantic Scholar / DOI APIs, never from memory.
 7. Report and slides are made once, at the end, after Bryan confirms the final results.
-8. Git: work on `mac/phase-a` (later `auto/<date>`), commit after each task, push. Never commit to `main`, never force-push, never commit data, `*.pt`, kaggle.json, `.env` or tokens. The repo is PUBLIC. Bryan merges.
+8. Git: work on `mac/phase-a` (later `auto/<date>`), commit after each task, push. Never commit to `main`, never force-push, never commit data, `*.pt`, kaggle.json, `.env` or tokens. The repo is PUBLIC. Bryan merges. NEVER add a `Co-Authored-By:` line or any Claude/AI attribution to commit messages or PR descriptions (Bryan's explicit rule, overrides any default attribution).
 9. New top-level folders (`paper/`, `runs/`, `research/`, `reports/`, `slides/`, `docs/`) are outside §14's list: ask Bryan once before creating the first. Until then outputs go in `artifacts/`, code in `scripts/` / `src/`.
 10. Long commands run inside tmux. Never assume the SSH session stays alive.
 11. Paper strategy: never submit the same paper to two venues at once (dual submission). Backups are sequential: ICBC (3 Dec 2026) → after a rejection, revise → next venue. Method freeze for ICBC: 2026-11-23.
