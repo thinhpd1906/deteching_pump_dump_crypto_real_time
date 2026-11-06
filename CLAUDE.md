@@ -256,7 +256,7 @@ Do NOT modify .claude/settings.json — file is read-only, managed by Bryan only
 
 ## 19. MAC MINI PLAN: one-command setup, Phase A (before ICBC), Phase B (24/7 automation)
 
-Agreed with Bryan 2026-11-06. This section is the full instruction set for Claude Code running on the Mac mini M4 Pro. Work through the tasks in order, report each acceptance check, and stop at every "STOP: ask Bryan".
+Agreed with Bryan 2026-11-06. This section is the full instruction set for Claude Code running on the Mac mini M4 Pro. Work through the tasks in order and report each acceptance check. The project runs unattended: follow the autonomy policy in 19.2b. Only HARD STOPs wait for Bryan; everything else proceeds on Claude's own recommendation.
 
 ### 19.1 How the Mac gets started
 On the Mac, Bryan runs once in Terminal:
@@ -280,10 +280,22 @@ Daily access from Windows: `ssh <user>@<mac-tailscale-name>` then `tmux attach -
 10. Long commands run inside tmux. Never assume the SSH session stays alive.
 11. Paper strategy: never submit the same paper to two venues at once (dual submission). Backups are sequential: ICBC (3 Dec 2026) → after a rejection, revise → next venue. Method freeze for ICBC: 2026-11-23.
 
-### 19.3 Phase A: before the ICBC freeze (target 2026-11-23)
-**A0 Environment check.** `python scripts/make_data_manifest.py --verify` (all OK), `python -m pytest tests/ -v`, write `artifacts/env_mac.json` (python, torch, macOS, chip, MPS, git sha). If the manifest fails: STOP: ask Bryan.
+### 19.2b Autonomy policy (Bryan, 2026-11-06): run 24/7, stop only where it matters
+Bryan wants the Mac to keep working without waiting for him. Two kinds of decision point:
+SOFT STOP (default for every decision not listed below): choose your own recommended option, write the choice and the reason into §20, notify Bryan (session message now; Telegram once Phase B3 exists), and continue immediately. Examples: Mac vs Kaggle, task order, reporting a gate verdict, finishing a search and posting the leaderboard, fixing technical errors, retrying failed jobs.
+HARD STOP (wait for Bryan's explicit approval), exactly these five:
+1. Anything that evaluates the test set for a new config: freeze + test run (A6) and checkpoint 1 before it. The test set is touched once.
+2. Declaring results final (checkpoint 2).
+3. Changing any locked decision (§4, §19.2 rule 2).
+4. Choosing a §12 pivot (e.g. CNN-BiLSTM as headline, C1+C3-led paper) when a claim fails.
+5. Data that does not match the manifest (labels / processed / checkpoints).
+While a HARD STOP is pending, keep doing every task that does not depend on the answer (e.g. A5 latency while checkpoint 1 waits). Never idle if independent work remains. Other rules still apply: no commits to `main`, no force-push, no new top-level folders without asking (rule 9), equal budgets per arm.
+Keeping the session alive: run the Mac session under `/loop` (dynamic, self-paced). Each wake-up: check running jobs/logs in tmux, advance to the next task when one finishes, commit + push to `mac/phase-a`, update §20. Use long wake-up intervals (20-30 min) while jobs are running; do not poll every minute.
 
-**A1 Device support cuda → mps → cpu.** `src/training/finetune.py:145` only knows cuda/cpu, so on the Mac it silently runs on CPU. Add `get_device(cfg)` to `src/training/common.py` (config `train.device: auto|cuda|mps|cpu`), use it in pretrain, finetune, eval_unsupervised, inference_service. AMP/GradScaler stay cuda-only; MPS has no float64; if `torch.Generator(device="mps")`/`randperm` fails keep the generator on CPU. `scripts/kaggle_queue.py` must run with 1 worker on the Mac and stay unchanged on Kaggle. Accept: tests green; `finetune --arch at --seed 0 --epochs 1` runs on mps; report sec/epoch mps vs cpu. STOP: ask Bryan whether Phase A training runs on the Mac or Kaggle.
+### 19.3 Phase A: before the ICBC freeze (target 2026-11-23)
+**A0 Environment check.** `python scripts/make_data_manifest.py --verify` (all OK), `python -m pytest tests/ -v`, write `artifacts/env_mac.json` (python, torch, macOS, chip, MPS, git sha). If the manifest fails (labels/processed/checkpoints; missing raw alone is not a failure): HARD STOP.
+
+**A1 Device support cuda → mps → cpu.** `src/training/finetune.py:145` only knows cuda/cpu, so on the Mac it silently runs on CPU. Add `get_device(cfg)` to `src/training/common.py` (config `train.device: auto|cuda|mps|cpu`), use it in pretrain, finetune, eval_unsupervised, inference_service. AMP/GradScaler stay cuda-only; MPS has no float64; if `torch.Generator(device="mps")`/`randperm` fails keep the generator on CPU. `scripts/kaggle_queue.py` must run with 1 worker on the Mac and stay unchanged on Kaggle. Accept: tests green; `finetune --arch at --seed 0 --epochs 1` runs on mps; report sec/epoch mps vs cpu. DONE 2026-11-06: MPS 68 s/epoch vs CPU 316 s. Decided: Phase A training (A3, A4) runs on the Mac; Kaggle GPU is a fallback if the A4 budget does not fit before the freeze.
 
 **A2 Val-only search mode + test ledger (must exist before any tuning).** Today finetune (`src/training/finetune.py:239`) and baselines (`src/models/baselines.py:124`) always evaluate test.
 (a) `--search` flag: never load test; write `artifacts/<mode>/search/<tag>_val.json` via `full_eval` on val + the overrides used.
@@ -292,7 +304,7 @@ Daily access from Windows: `ssh <user>@<mac-tailscale-name>` then `tmux attach -
 (d) Atomic writes (`*.tmp` then `os.replace`) for all JSON/checkpoints.
 Accept: a test proving `--search` never opens test.npz; ledger refusal test; default behaviour unchanged.
 
-**A3 Gate 3 at 10% labels (start right after A1).** If not already done on Kaggle: default config, normal mode (protocol runs, not tuning): `at --pretrained` and `at` at `--label-frac 0.1`, seeds 0,1,2; then cnnbilstm at 0.1; then eval_unsupervised (B7/B10). Use `scripts/kaggle_queue.py` (skips finished tags). Then label_efficiency and evaluate. Accept: Gate 3 verdict at 10% with mean ± std and paired symbol-bootstrap (bootstrap-ci skill); update §5/§6. STOP: report to Bryan. If at_pre doesn't win, apply §12 only after Bryan confirms.
+**A3 Gate 3 at 10% labels (start right after A1).** If not already done on Kaggle: default config, normal mode (protocol runs, not tuning): `at --pretrained` and `at` at `--label-frac 0.1`, seeds 0,1,2; then cnnbilstm at 0.1; then eval_unsupervised (B7/B10). Use `scripts/kaggle_queue.py` (skips finished tags). Then label_efficiency and evaluate. Accept: Gate 3 verdict at 10% with mean ± std and paired symbol-bootstrap (bootstrap-ci skill); update §5/§6. SOFT STOP: notify Bryan with the verdict, then continue to A4 without waiting. If at_pre doesn't win, A4 still runs (equal budget for all arms, it may change the picture), but choosing a §12 pivot is a HARD STOP.
 
 **A4 Time-boxed fair tuning.** `scripts/search.py`, Optuna with SQLite at `artifacts/search/optuna_<arm>.db` (resumable). Config block:
 ```yaml
@@ -309,11 +321,11 @@ automation:
     must_beat: b5_logreg
     margin: seed_std
 ```
-Every trial = finetune `--search --set ...`. Pretrained checkpoints cached by hash of pretrain settings (`artifacts/adaptive/pretrain_cache/<hash>.pt`). Log `artifacts/search/trials.jsonl`, write `artifacts/search/leaderboard.md`. Accept: survives `kill -9` and resumes without losing finished trials. Then STOP: human checkpoint 1. Show the leaderboard and proposed frozen config per arm. Do not run test.
+Every trial = finetune `--search --set ...`. Pretrained checkpoints cached by hash of pretrain settings (`artifacts/adaptive/pretrain_cache/<hash>.pt`). Log `artifacts/search/trials.jsonl`, write `artifacts/search/leaderboard.md`. Accept: survives `kill -9` and resumes without losing finished trials. Then HARD STOP: human checkpoint 1. Show the leaderboard and proposed frozen config per arm. Do not run test. While waiting, continue A5 or other non-test work.
 
 **A5 C3 latency (parallel with A3/A4, CPU).** `docker-compose.yml` uses `bitnami/kafka:3.7`; if it doesn't pull on arm64 under colima, switch to `apache/kafka` (uses `KAFKA_*` env names, not `KAFKA_CFG_*`). Pipeline kafka_producer → python_bars (or spark_streaming) → inference_service --model at_pre. Add `scripts/measure_latency.py`: ≥2 h live, raw samples `artifacts/latency/samples.csv`, `artifacts/latency/summary.json` (p50/p95/p99, count, symbols, device, git sha). Report separately (a) bar-close → alert and (b) trade time → alert (includes the ≤5 s bar wait). Record clock offset vs NTP (`sntp time.apple.com`) at start and end. Run the verify-scaler-parity skill. Accept: summary exists, parity passes, target p95 (a) < 5 s.
 
-**A6 Freeze + single test run (only after checkpoint 1 approval).** Git tag `freeze-icbc-v1`, frozen configs in `config/frozen/icbc_v1.yaml`. Each frozen arm in normal mode, seeds 0,1,2, at 100% and 10% labels, tags suffixed `_final`, all through the ledger. evaluate.py + paired bootstrap vs every baseline. STOP: human checkpoint 2, Bryan confirms the results are final.
+**A6 Freeze + single test run (only after checkpoint 1 approval).** Git tag `freeze-icbc-v1`, frozen configs in `config/frozen/icbc_v1.yaml`. Each frozen arm in normal mode, seeds 0,1,2, at 100% and 10% labels, tags suffixed `_final`, all through the ledger. evaluate.py + paired bootstrap vs every baseline. HARD STOP: human checkpoint 2, Bryan confirms the results are final.
 
 **A7 Paper support (after checkpoint 2; ask for `paper/` first).** `scripts/make_tables.py` (LaTeX tables from JSON), extend `scripts/plot_figures.py`, `scripts/fetch_bib.py` (BibTeX by arXiv id / DOI), `scripts/check_numbers.py` (fails if a number in the .tex has no artifact source). @paper-agent drafts, @reviewer-agent attacks. Bryan rewrites, owns the text, and discloses AI assistance per HUST and venue policy.
 
