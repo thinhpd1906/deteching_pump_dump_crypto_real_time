@@ -70,7 +70,7 @@ set +u
 # shellcheck disable=SC1091
 source .venv/bin/activate
 set -u
-uv pip install -r requirements.txt optuna pytest kaggle
+uv pip install -r requirements.txt optuna pytest kaggle six
 python - <<'EOF'
 import torch
 print("torch", torch.__version__, "| MPS available:", torch.backends.mps.is_available())
@@ -97,7 +97,8 @@ else
       printf '%s' "$KTOK" > "$HOME/.kaggle/access_token"; chmod 600 "$HOME/.kaggle/access_token"
     fi
     if kaggle_ok; then break; fi
-    warn "Kaggle rejected that credential, try again."
+    warn "Kaggle check failed, error was:"
+    kaggle datasets files phancthnh/pnd-thesis-checkpoint 2>&1 | tail -3
   done
   kaggle_ok || { echo "Kaggle login failed 3 times. Fix it, then re-run this script."; exit 1; }
   ok "Kaggle credentials work"
@@ -109,7 +110,7 @@ if python scripts/make_data_manifest.py --verify --only processed >/dev/null 2>&
   ok "processed data already verified"
 else
   rm -rf "$DL_DIR/processed_dl"
-  kaggle datasets download -d phancthnh/pnd-thesis-processed -p "$DL_DIR/processed_dl" --unzip
+  kaggle datasets download -d phancthnh/pnd-thesis-processed-data -p "$DL_DIR/processed_dl" --unzip
   if [[ -f "$DL_DIR/processed_dl/pnd-processed.zip" ]]; then
     unzip -oq "$DL_DIR/processed_dl/pnd-processed.zip" -d data/
   elif [[ -d "$DL_DIR/processed_dl/processed" ]]; then

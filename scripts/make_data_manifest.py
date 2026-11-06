@@ -31,6 +31,12 @@ GROUPS = {
 
 def sha256(path: str, chunk: int = 1 << 20) -> str:
     h = hashlib.sha256()
+    if path.endswith(".csv"):
+        # git checks text files out as CRLF on Windows and LF on the Mac;
+        # hash CSVs with normalised line endings so the same content matches.
+        with open(path, "rb") as fh:
+            h.update(fh.read().replace(b"\r\n", b"\n"))
+        return h.hexdigest()
     with open(path, "rb") as fh:
         while block := fh.read(chunk):
             h.update(block)
