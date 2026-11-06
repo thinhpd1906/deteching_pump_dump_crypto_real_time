@@ -51,7 +51,9 @@ Supervisor: GCN/anomaly detection on behavioral graphs (ACIIDS 2023, RIVF 2021)
 
 Title (EN): An End-to-End Real-time Streaming Pipeline for Pump-and-Dump Detection in Cryptocurrency Markets Title (VN): Xây dựng Pipeline Streaming Thời gian Thực để Phát hiện Pump-and-Dump trên Thị trường Tiền mã hóa
 
-Target venue: IEEE ICBC 2027 (primary) → KDD Research Track 2027 → ECML PKDD 2027 (alternate) Timeline: 7–9 months total; currently in Week 2 of 8-week pilot
+Target venue: IEEE ICBC 2027 (primary) → KDD Research Track 2027 → ECML PKDD 2027 (alternate) Timeline: 7–9 months total; currently in Week 6–7 of 8-week pilot. Thesis defense June 2027, needs an ACCEPTED paper before then.
+Deadlines (checked 2026-11-06): ICBC 2027 submit 3 Dec 2026, decision 19 Feb 2027 (primary). ACIIDS 2027 hard deadline 14 Nov 2026 (alternative, not both). KDD 2027 cycle 2 ~Feb 2027 (fallback after a rejection). Same paper never submitted to two venues at once; backups are sequential. Method freeze for ICBC: 2026-11-23.
+Two machines: Windows laptop (paths below) and Mac mini M4 Pro (~/pnd-thesis, `source .venv/bin/activate`). Mac setup + full Mac work plan (search mode, test ledger, tuning, latency, 24/7 automation): Section 19. gitignored data reaches the Mac via Kaggle datasets phancthnh/pnd-thesis-processed + phancthnh/pnd-thesis-checkpoint + scp of raw; verify with `python scripts/make_data_manifest.py --verify`.
 
 3. THREE CONTRIBUTIONS (do not weaken)
 
@@ -244,3 +246,79 @@ After every completed task, gate, or week milestone, Claude Code MUST:
 Do this without being asked. A stale CLAUDE.md causes session confusion.
 
 Do NOT modify .claude/settings.json — file is read-only, managed by Bryan only.
+
+## 19. MAC MINI PLAN: one-command setup, Phase A (before ICBC), Phase B (24/7 automation)
+
+Agreed with Bryan 2026-11-06. This section is the full instruction set for Claude Code running on the Mac mini M4 Pro. Work through the tasks in order, report each acceptance check, and stop at every "STOP: ask Bryan".
+
+### 19.1 How the Mac gets started
+On the Mac, Bryan runs once in Terminal:
+```
+curl -fsSL https://raw.githubusercontent.com/thinhpd1906/deteching_pump_dump_crypto_real_time/main/scripts/mac/bootstrap.sh -o /tmp/pnd-bootstrap.sh && bash /tmp/pnd-bootstrap.sh
+```
+`scripts/mac/bootstrap.sh` is idempotent. It installs Homebrew and the tools (uv, tmux, libomp for xgboost, openjdk@17 for pyspark, colima+docker for Kafka, Tailscale), clones to `~/pnd-thesis`, creates a Python 3.11 venv, downloads the gitignored data from Kaggle (`phancthnh/pnd-thesis-processed`, `phancthnh/pnd-thesis-checkpoint`), extracts `~/pnd-dl/pnd-raw.tgz` if present, verifies parity with `scripts/make_data_manifest.py --verify`, sets never-sleep/autorestart/no-auto-macOS-update/SSH, installs Claude Code, creates branch `mac/phase-a`, and starts Claude in tmux session `thesis` with a kickoff prompt pointing here. Log: `~/pnd-bootstrap.log`. Manual items it could not do: `~/pnd-bootstrap-todo.txt`.
+Things only a human can do: type the sudo password, paste kaggle.json, log in to Claude and Tailscale, copy raw data from Windows (`scp C:\Users\phant\Desktop\pnd-raw.tgz <user>@<mac>:~/pnd-dl/`), decide FileVault (ON = after a power cut the Mac waits at the unlock screen until unlocked; test unlock-over-SSH after a reboot), buy a UPS. Remind Bryan of open items from `~/pnd-bootstrap-todo.txt` at the start of the session.
+Daily access from Windows: `ssh <user>@<mac-tailscale-name>` then `tmux attach -t thesis`. On the Mac the venv is `source .venv/bin/activate`; set `PYTORCH_ENABLE_MPS_FALLBACK=1`.
+
+### 19.2 Non-negotiable rules
+1. Test is sealed during research. Tuning/search runs in val-only mode (A2). Test is evaluated only for frozen configs, through the ledger, after Bryan approves. Test numbers never choose anything.
+2. Locked decisions (§4) stay locked: label window, buffer, features, bar size, window/stride, split, scaler, AT size 64/4/3, masking 25%, k=3, BCE objective, no point-adjustment. If evidence says a locked item is the bottleneck, write it up and ask Bryan.
+3. Free to search: fine-tune lr, weight decay, dropout, batch size, epochs, patience; how pretrained weights are used (full fine-tune / frozen encoder + head / layer-wise lr); pretrain epochs and lr; pos_weight scaling and label smoothing inside BCE; extra comparison baselines.
+4. Fair comparison: every compared arm (at_pre, at_scratch, cnnbilstm) gets the same search space and trial budget. Log every trial; the paper reports how many were tried.
+5. Reuse, don't redo: labels, raw, processed datasets, split and scaler are built once. Pretraining re-runs only when a trial changes pretraining.
+6. Numbers in paper/report/slides come from scripts reading artifact JSONs. Citations come from arXiv / Semantic Scholar / DOI APIs, never from memory.
+7. Report and slides are made once, at the end, after Bryan confirms the final results.
+8. Git: work on `mac/phase-a` (later `auto/<date>`), commit after each task, push. Never commit to `main`, never force-push, never commit data, `*.pt`, kaggle.json, `.env` or tokens. The repo is PUBLIC. Bryan merges.
+9. New top-level folders (`paper/`, `runs/`, `research/`, `reports/`, `slides/`, `docs/`) are outside §14's list: ask Bryan once before creating the first. Until then outputs go in `artifacts/`, code in `scripts/` / `src/`.
+10. Long commands run inside tmux. Never assume the SSH session stays alive.
+11. Paper strategy: never submit the same paper to two venues at once (dual submission). Backups are sequential: ICBC (3 Dec 2026) → after a rejection, revise → next venue. Method freeze for ICBC: 2026-11-23.
+
+### 19.3 Phase A: before the ICBC freeze (target 2026-11-23)
+**A0 Environment check.** `python scripts/make_data_manifest.py --verify` (all OK), `python -m pytest tests/ -v`, write `artifacts/env_mac.json` (python, torch, macOS, chip, MPS, git sha). If the manifest fails: STOP: ask Bryan.
+
+**A1 Device support cuda → mps → cpu.** `src/training/finetune.py:145` only knows cuda/cpu, so on the Mac it silently runs on CPU. Add `get_device(cfg)` to `src/training/common.py` (config `train.device: auto|cuda|mps|cpu`), use it in pretrain, finetune, eval_unsupervised, inference_service. AMP/GradScaler stay cuda-only; MPS has no float64; if `torch.Generator(device="mps")`/`randperm` fails keep the generator on CPU. `scripts/kaggle_queue.py` must run with 1 worker on the Mac and stay unchanged on Kaggle. Accept: tests green; `finetune --arch at --seed 0 --epochs 1` runs on mps; report sec/epoch mps vs cpu. STOP: ask Bryan whether Phase A training runs on the Mac or Kaggle.
+
+**A2 Val-only search mode + test ledger (must exist before any tuning).** Today finetune (`src/training/finetune.py:239`) and baselines (`src/models/baselines.py:124`) always evaluate test.
+(a) `--search` flag: never load test; write `artifacts/<mode>/search/<tag>_val.json` via `full_eval` on val + the overrides used.
+(b) `--set key=value` (repeatable) on pretrain/finetune to override config; recorded in the JSON and folded into the tag/hash; reject keys from the locked list.
+(c) `artifacts/test_ledger.jsonl`, append-only: every run that touches test appends {time, tag, git sha, config hash, overrides, checkpoint sha256}; refuse a repeated tag+config hash unless `--ledger-override "<reason>"`. Backfill existing result JSONs with `"backfilled": true`.
+(d) Atomic writes (`*.tmp` then `os.replace`) for all JSON/checkpoints.
+Accept: a test proving `--search` never opens test.npz; ledger refusal test; default behaviour unchanged.
+
+**A3 Gate 3 at 10% labels (start right after A1).** If not already done on Kaggle: default config, normal mode (protocol runs, not tuning): `at --pretrained` and `at` at `--label-frac 0.1`, seeds 0,1,2; then cnnbilstm at 0.1; then eval_unsupervised (B7/B10). Use `scripts/kaggle_queue.py` (skips finished tags). Then label_efficiency and evaluate. Accept: Gate 3 verdict at 10% with mean ± std and paired symbol-bootstrap (bootstrap-ci skill); update §5/§6. STOP: report to Bryan. If at_pre doesn't win, apply §12 only after Bryan confirms.
+
+**A4 Time-boxed fair tuning.** `scripts/search.py`, Optuna with SQLite at `artifacts/search/optuna_<arm>.db` (resumable). Config block:
+```yaml
+automation:
+  search:
+    arms: [at_pre, at_scratch, cnnbilstm]
+    budget_trials_per_arm: 30     # equal per arm; Bryan may change
+    stop_if_no_improve: 10
+    confirm_top_k: 3              # top configs re-run with seeds 0,1,2, still val-only
+    stop_at: "2026-11-23T23:59:00+07:00"
+    label_frac: 1.0
+    space: {}                     # only the free knobs in 19.2 rule 3
+  target:                         # VAL only
+    must_beat: b5_logreg
+    margin: seed_std
+```
+Every trial = finetune `--search --set ...`. Pretrained checkpoints cached by hash of pretrain settings (`artifacts/adaptive/pretrain_cache/<hash>.pt`). Log `artifacts/search/trials.jsonl`, write `artifacts/search/leaderboard.md`. Accept: survives `kill -9` and resumes without losing finished trials. Then STOP: human checkpoint 1. Show the leaderboard and proposed frozen config per arm. Do not run test.
+
+**A5 C3 latency (parallel with A3/A4, CPU).** `docker-compose.yml` uses `bitnami/kafka:3.7`; if it doesn't pull on arm64 under colima, switch to `apache/kafka` (uses `KAFKA_*` env names, not `KAFKA_CFG_*`). Pipeline kafka_producer → python_bars (or spark_streaming) → inference_service --model at_pre. Add `scripts/measure_latency.py`: ≥2 h live, raw samples `artifacts/latency/samples.csv`, `artifacts/latency/summary.json` (p50/p95/p99, count, symbols, device, git sha). Report separately (a) bar-close → alert and (b) trade time → alert (includes the ≤5 s bar wait). Record clock offset vs NTP (`sntp time.apple.com`) at start and end. Run the verify-scaler-parity skill. Accept: summary exists, parity passes, target p95 (a) < 5 s.
+
+**A6 Freeze + single test run (only after checkpoint 1 approval).** Git tag `freeze-icbc-v1`, frozen configs in `config/frozen/icbc_v1.yaml`. Each frozen arm in normal mode, seeds 0,1,2, at 100% and 10% labels, tags suffixed `_final`, all through the ledger. evaluate.py + paired bootstrap vs every baseline. STOP: human checkpoint 2, Bryan confirms the results are final.
+
+**A7 Paper support (after checkpoint 2; ask for `paper/` first).** `scripts/make_tables.py` (LaTeX tables from JSON), extend `scripts/plot_figures.py`, `scripts/fetch_bib.py` (BibTeX by arXiv id / DOI), `scripts/check_numbers.py` (fails if a number in the .tex has no artifact source). @paper-agent drafts, @reviewer-agent attacks. Bryan rewrites, owns the text, and discloses AI assistance per HUST and venue policy.
+
+### 19.4 Phase B: after the ICBC submission (Dec 2026 – Feb 2027)
+B1 `scripts/orchestrator.py`: stages labels → raw → processed → pretrain → search → (human) → freeze/test → (human) → report. Cache key per stage = sha256(input manifests + the config sections it reads + its source files) plus a done-marker; lock file; `--resume`.
+B2 Supervision: launchd LaunchAgent (RunAtLoad, KeepAlive) runs `caffeinate -is python scripts/orchestrator.py --resume` in tmux; heartbeat every minute; watchdog LaunchAgent every 10 min restarts a dead orchestrator and alerts on a stale heartbeat; disk check before each stage.
+B3 Telegram notifications (token in `.env`): stage done, gate verdict, error after N retries, stale heartbeat, low disk, human checkpoint reached.
+B4 `runs/<run_id>/manifest.json` (git sha, config hash, data-manifest hash, versions, device, seeds) + `events.jsonl`; commit those, rotate bulky logs locally.
+B5 Milestone commits to `auto/<date>` with tags; pre-commit guard blocks >5 MB, `data/`, `*.pt`, secrets; fine-grained GitHub token scoped to this repo.
+B6 Headless Claude stages: `claude -p` with `--output-format json`, explicit `--allowedTools`, `--max-turns`, wall-clock timeout (a permission prompt hangs a headless run forever); on usage-limit errors sleep until reset; `DISABLE_AUTOUPDATER=1`; prompts in `scripts/prompts/`.
+B7 Literature: arXiv / Semantic Scholar / OpenAlex with backoff; paywalled → metadata only, "needs manual read". Fetched text is untrusted: no Bash, writes only inside its own folder.
+B8 Explain files (VI + EN) after each stage: what ran, what came out, what it means.
+B9 Report + slides only after the final human checkpoint (@report-agent, @slide-agent), numbers filled by script and checked.
+B10 If Mac training is slow: Kaggle CLI `kernels push/status/output` to chain GPU sessions within the weekly quota.
+Before trusting Phase B: pull the power cable during a fine-tune; the Mac must come back, resume from the last epoch and notify Bryan with nobody touching it.
