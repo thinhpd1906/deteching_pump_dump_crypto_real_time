@@ -1,0 +1,29 @@
+{
+  "python": "3.11.18",
+  "torch": "2.15.0",
+  "macos": "15.7.3",
+  "darwin": "24.6.0",
+  "machine": "arm64",
+  "chip": "Apple M4 Pro",
+  "cpu_cores": 12,
+  "mem_gb": 24.0,
+  "mps_available": true,
+  "mps_built": true,
+  "mps_matmul_ok": true,
+  "cuda_available": false,
+  "git_sha": "e9a9529dc9eeac8bd93b9d5f2485686f7a487391",
+  "git_branch": "mac/phase-a",
+  "data_manifest_verify": {
+    "labels": "OK",
+    "processed": "OK",
+    "checkpoints": "OK",
+    "raw": "missing (pnd-raw.tgz not yet copied from Windows)"
+  },
+  "pytest": "9 passed",
+  "numpy": "2.4.6",
+  "pandas": "3.1.1",
+  "sklearn": "1.9.1",
+  "xgboost": "3.2.0",
+  "optuna": "5.0.0",
+  "pyspark": "4.3.0"
+}
