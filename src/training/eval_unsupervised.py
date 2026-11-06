@@ -22,8 +22,8 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from src.models.anomaly_transformer import AnomalyTransformer, anomaly_score
 from src.models.deep_baselines import LSTMAE
-from src.training.common import (full_eval, load_pretrain_pool, load_split,
-                                 save_result, tune_threshold)
+from src.training.common import (full_eval, get_device, load_pretrain_pool,
+                                 load_split, save_result, tune_threshold)
 
 
 @torch.no_grad()
@@ -64,7 +64,7 @@ def main() -> None:
     os.makedirs(art, exist_ok=True)
     labels_csv = cfg["paths"]["labels_csv"]
 
-    dev = "cuda" if torch.cuda.is_available() else "cpu"
+    dev = get_device(cfg)
 
     Xv, yv, ev, pv = load_split(dd, "val")
     Xte, yte, ete, pte = load_split(dd, "test")

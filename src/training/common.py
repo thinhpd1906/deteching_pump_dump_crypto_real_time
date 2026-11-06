@@ -4,7 +4,7 @@ Contains the EVALUATION PROTOCOL that the whole paper depends on:
   * threshold tuned on VALIDATION only (never 0.5, never on test)
   * NO point-adjustment (Kim et al., AAAI 2022) -- plain window-level scoring
   * event-level metrics (what a practitioner actually cares about)
-  * bootstrap CIs resampled over EVENTS (not windows)
+  * bootstrap CIs resampled over SYMBOLS (not windows)
 """
 from __future__ import annotations
 
@@ -15,6 +15,39 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import (average_precision_score, f1_score,
                              precision_score, recall_score, roc_auc_score)
+
+
+# ------------------------------------------------------------------ device
+def get_device(cfg: dict | None = None) -> str:
+    """Pick the torch device from config `train.device` (auto|cuda|mps|cpu).
+
+    auto = cuda if available, else Apple MPS, else cpu. An explicit request
+    for an unavailable device raises instead of silently falling back.
+    """
+    import torch
+    want = str(((cfg or {}).get("train", {}) or {}).get("device", "auto")).lower()
+    has = {"cuda": torch.cuda.is_available(),
+           "mps": getattr(torch.backends, "mps", None) is not None
+           and torch.backends.mps.is_available(),
+           "cpu": True}
+    if want == "auto":
+        return next(d for d in ("cuda", "mps", "cpu") if has[d])
+    if want not in has:
+        raise ValueError(f"train.device must be auto|cuda|mps|cpu, got {want!r}")
+    if not has[want]:
+        raise RuntimeError(f"train.device={want} requested but not available")
+    return want
+
+
+def make_generator(dev: str, seed: int):
+    """Seeded torch.Generator on `dev`; falls back to CPU if `dev` lacks one."""
+    import torch
+    try:
+        g = torch.Generator(device=dev).manual_seed(seed)
+        torch.randperm(2, device=dev, generator=g)
+        return torch.Generator(device=dev).manual_seed(seed)
+    except (RuntimeError, TypeError):
+        return torch.Generator(device="cpu").manual_seed(seed)
 
 
 # ------------------------------------------------------------------ loading

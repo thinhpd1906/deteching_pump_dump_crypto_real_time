@@ -45,6 +45,7 @@ import yaml
 from src.models.anomaly_transformer import ATClassifier, AnomalyTransformer
 from src.models.deep_baselines import CNNBiLSTM
 from src.training.common import (EarlyStop, full_eval, load_split, save_result,
+                                 get_device, make_generator,
                                  subsample_labels, tune_threshold)
 
 EXIT_INCOMPLETE = 75
@@ -142,7 +143,7 @@ def main() -> None:
                                     etr, ptr, gap_ns)
 
     win, d_in = Xtr.shape[1], Xtr.shape[2]
-    dev = "cuda" if torch.cuda.is_available() else "cpu"
+    dev = get_device(cfg)
     amp = bool(TR.get("amp", False)) and dev == "cuda"
     if dev == "cuda":
         torch.backends.cudnn.benchmark = True
@@ -157,12 +158,12 @@ def main() -> None:
 
     crit = torch.nn.BCEWithLogitsLoss(pos_weight=torch.tensor([pw], device=dev))
     opt = torch.optim.AdamW(model.parameters(), lr=TR["lr"])
-    scaler = torch.cuda.amp.GradScaler(enabled=amp)
+    scaler = torch.amp.GradScaler("cuda", enabled=amp)
 
     # whole train split lives on the device: no per-sample DataLoader overhead
     Xg = torch.from_numpy(Xtr).to(dev)
     yg = torch.from_numpy(ytr.astype(np.float32)).to(dev)
-    gen = torch.Generator(device=dev).manual_seed(seed)
+    gen = make_generator(dev, seed)
     bs = TR["batch_size"]
 
     epochs = args.epochs or TR["finetune_epochs"]
@@ -200,7 +201,8 @@ def main() -> None:
         t0 = time.time()
         model.train()
         tot = 0.0
-        perm = torch.randperm(len(yg), device=dev, generator=gen)
+        perm = torch.randperm(len(yg), device=gen.device,
+                              generator=gen).to(dev)
         for i in range(0, len(perm), bs):
             idx = perm[i:i + bs]
             xb, yb = Xg[idx], yg[idx]

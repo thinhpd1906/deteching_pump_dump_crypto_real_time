@@ -30,7 +30,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from src.models.anomaly_transformer import (AnomalyTransformer, anomaly_score,
                                             minimax_losses)
-from src.training.common import load_pretrain_pool, load_split
+from src.training.common import get_device, load_pretrain_pool, load_split
 
 
 def mask_input(x: torch.Tensor, ratio: float) -> torch.Tensor:
@@ -82,7 +82,7 @@ def main() -> None:
                         batch_size=TR["batch_size"], shuffle=True,
                         drop_last=True)
 
-    dev = "cuda" if torch.cuda.is_available() else "cpu"
+    dev = get_device(cfg)
     model = AnomalyTransformer(win, d_in, M["d_model"], M["n_heads"],
                                M["n_layers"], M["dropout"]).to(dev)
     opt = torch.optim.AdamW(model.parameters(), lr=TR["lr"])

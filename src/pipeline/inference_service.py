@@ -23,6 +23,8 @@ import pandas as pd
 import torch
 import yaml
 
+from src.training.common import get_device
+
 
 def load_model(art: str, tag: str, dev: str):
     path = os.path.join(art, f"{tag}.pt")
@@ -60,7 +62,7 @@ def main() -> None:
     P, B, W = cfg["pipeline"], cfg["bars"], cfg["windows"]
     dd = os.path.join(cfg["paths"]["processed_dir"], args.clean)
     art = os.path.join(cfg["paths"]["artifacts_dir"], args.clean)
-    dev = "cuda" if torch.cuda.is_available() else "cpu"
+    dev = get_device(cfg)
 
     model, ck = load_model(art, args.model, dev)
     thr = cfg["pipeline"].get("alert_threshold") or ck.get("thr", 0.5)
