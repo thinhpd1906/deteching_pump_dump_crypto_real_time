@@ -230,6 +230,40 @@ def save_result(artifacts_dir: str, mode: str, tag: str, res: dict) -> None:
                       os.path.join(artifacts_dir, mode, f"{tag}_test.json"))
 
 
+def save_scores(artifacts_dir: str, mode: str, tag: str, scores, thr: float,
+                y_true, pair, split: str = "test") -> str:
+    """Per-window scores -> artifacts/<mode>/scores/<tag>_<split>.npz.
+
+    Needed for paired symbol-level bootstrap between models WITHOUT touching
+    the test set again. y/pair are not stored (they live in <split>.npz); a
+    fingerprint of them is, so a mismatch is detected on load.
+    """
+    import hashlib
+    out = os.path.join(artifacts_dir, mode, "scores")
+    os.makedirs(out, exist_ok=True)
+    fp = hashlib.sha256(np.asarray(y_true, np.int64).tobytes()
+                        + np.asarray(pair).astype("U16").tobytes()).hexdigest()
+    path = os.path.join(out, f"{tag}_{split}.npz")
+    tmp = path + ".tmp.npz"
+    np.savez_compressed(tmp, scores=np.asarray(scores, np.float32),
+                        thr=np.float64(thr), split_fingerprint=fp)
+    os.replace(tmp, path)
+    return path
+
+
+def load_scores(artifacts_dir: str, mode: str, tag: str, y_true, pair,
+                split: str = "test"):
+    """Return (scores, thr); raises if they do not belong to this split."""
+    import hashlib
+    z = np.load(os.path.join(artifacts_dir, mode, "scores",
+                             f"{tag}_{split}.npz"))
+    fp = hashlib.sha256(np.asarray(y_true, np.int64).tobytes()
+                        + np.asarray(pair).astype("U16").tobytes()).hexdigest()
+    if str(z["split_fingerprint"]) != fp:
+        raise ValueError(f"scores for {tag} do not match the {split} split")
+    return z["scores"], float(z["thr"])
+
+
 def search_result_path(artifacts_dir: str, mode: str, tag: str) -> str:
     return os.path.join(artifacts_dir, mode, "search", f"{tag}_val.json")
 

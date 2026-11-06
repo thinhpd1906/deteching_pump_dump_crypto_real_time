@@ -139,6 +139,16 @@ def test_finetune_default_writes_test_and_ledger_then_refuses(tiny):
     assert e["config_hash"] == P.config_hash(tiny["cfg"])
     assert e["checkpoint_sha256"] and len(e["checkpoint_sha256"]) == 64
     assert json.load(open(out))["config_hash"] == e["config_hash"]
+    # per-window test scores saved at the single test touch
+    from src.training.common import load_scores, load_split
+    _, yte, _, pte = load_split(str(tiny["dd"]), "test")
+    sc, thr = load_scores(str(tiny["art"]), "adaptive",
+                          "cnnbilstm_scratch_s0", yte, pte)
+    assert len(sc) == len(yte)
+    assert thr == pytest.approx(json.load(open(out))["thr"], abs=1e-6)
+    with pytest.raises(ValueError):
+        load_scores(str(tiny["art"]), "adaptive", "cnnbilstm_scratch_s0",
+                    1 - yte, pte)
 
     # result removed (e.g. someone wants a "better" number): ledger refuses,
     # before any training happens

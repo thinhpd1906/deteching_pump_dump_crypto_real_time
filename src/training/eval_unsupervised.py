@@ -23,7 +23,8 @@ from torch.utils.data import DataLoader, TensorDataset
 from src.models.anomaly_transformer import AnomalyTransformer, anomaly_score
 from src.models.deep_baselines import LSTMAE
 from src.training.common import (full_eval, get_device, load_pretrain_pool,
-                                 load_split, save_result, tune_threshold)
+                                 load_split, save_result, save_scores,
+                                 tune_threshold)
 from src.training.protocol import (atomic_torch_save, config_hash, git_sha,
                                    ledger_append, ledger_check)
 
@@ -101,6 +102,7 @@ def main(argv: list[str] | None = None) -> None:
         res = full_eval(yte, st, thr, ete, pte, labels_csv, cfg)
         res.update({"val_f1": round(float(f1v), 4), "seed": seed,
                     "config_hash": chash, "git_sha": git_sha()})
+        save_scores(art_root, args.clean, "b10_at_unsup", st, thr, yte, pte)
         save_result(art_root, args.clean, "b10_at_unsup", res)
         print(f"  val F1={f1v:.4f} | test F1={res['f1']:.4f} "
               f"AUC={res['roc_auc']:.4f} evR={res['event_recall']:.4f}")
@@ -134,6 +136,7 @@ def main(argv: list[str] | None = None) -> None:
     res = full_eval(yte, st, thr, ete, pte, labels_csv, cfg)
     res.update({"val_f1": round(float(f1v), 4), "seed": seed,
                 "config_hash": chash, "git_sha": git_sha()})
+    save_scores(art_root, args.clean, "b7_lstmae", st, thr, yte, pte)
     save_result(art_root, args.clean, "b7_lstmae", res)
     print(f"  val F1={f1v:.4f} | test F1={res['f1']:.4f} "
           f"AUC={res['roc_auc']:.4f} evR={res['event_recall']:.4f}")

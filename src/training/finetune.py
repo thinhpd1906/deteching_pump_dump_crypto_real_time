@@ -55,6 +55,7 @@ from src.models.anomaly_transformer import ATClassifier, AnomalyTransformer
 from src.models.deep_baselines import CNNBiLSTM
 from src.training.common import (EarlyStop, full_eval, get_device,
                                  load_split, make_generator, save_result,
+                                 save_scores,
                                  save_search_result, search_result_path,
                                  subsample_labels, tune_threshold)
 from src.training.protocol import (add_protocol_args, apply_overrides,
@@ -300,6 +301,7 @@ def main(argv: list[str] | None = None) -> None:
     s_te = predict_scores(model, Xte, dev, amp=amp)
     res = full_eval(yte, s_te, ck["thr"], ete, pte, labels_csv, cfg)
     res.update(meta)
+    save_scores(art_root, args.clean, tag, s_te, ck["thr"], yte, pte)
     save_result(art_root, args.clean, tag, res)
     os.remove(last_path)
 

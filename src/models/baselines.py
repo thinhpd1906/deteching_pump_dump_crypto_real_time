@@ -26,7 +26,8 @@ from sklearn.preprocessing import StandardScaler
 
 from src.data.features import FEATURES
 from src.training.common import (full_eval, load_split, save_result,
-                                 save_search_result, tune_threshold)
+                                 save_scores, save_search_result,
+                                 tune_threshold)
 from src.training.protocol import (add_protocol_args, config_hash, git_sha,
                                    ledger_append, ledger_check)
 
@@ -161,6 +162,7 @@ def main(argv: list[str] | None = None) -> None:
         res = full_eval(yte, s_te, thr, ete, pte, labels_csv, cfg)
         res.update({"val_f1": round(float(f1v), 4), "config_hash": chash,
                     "git_sha": git_sha()})
+        save_scores(art, args.clean, tag, s_te, thr, yte, pte)
         save_result(art, args.clean, tag, res)
         print(f"  [{tag:14s}] valF1={f1v:.4f} | testF1={res['f1']:.4f} "
               f"P={res['precision']:.4f} R={res['recall']:.4f} "
