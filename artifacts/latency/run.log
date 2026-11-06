@@ -1,0 +1,31 @@
+ Container pnd-thesis-kafka-1 Running 
+[latency] run 20261106_144421: 3.0 h, 20 symbols, model at_pre_lf10_s0 on cpu; samples -> /Users/elvisle/pnd-thesis/artifacts/latency/samples.csv
+[latency] 14:44 -1 bars scored, 180 min left
+[latency] 14:54 26 bars scored, 170 min left
+[latency] 15:04 1676 bars scored, 160 min left
+[latency] 15:14 3344 bars scored, 150 min left
+[latency] 15:24 5011 bars scored, 140 min left
+[latency] 15:34 6559 bars scored, 130 min left
+[latency] 15:44 8109 bars scored, 120 min left
+[latency] 15:54 9543 bars scored, 110 min left
+[latency] 16:04 11072 bars scored, 100 min left
+[latency] 16:14 12682 bars scored, 90 min left
+[latency] 16:24 14230 bars scored, 80 min left
+[latency] 16:34 15805 bars scored, 70 min left
+[latency] 16:44 17312 bars scored, 60 min left
+[latency] 16:54 18774 bars scored, 50 min left
+[latency] 17:04 20341 bars scored, 40 min left
+[latency] 17:14 21909 bars scored, 30 min left
+[latency] 17:24 23458 bars scored, 20 min left
+[latency] 17:34 25046 bars scored, 10 min left
+
+=== LATENCY [at_pre_lf10_s0 on cpu] 2.834 h, 26606 bars, 20 symbols ===
+  a_bar_close_to_decision_ms       p50=1063.6  p95=1156.5  p99=1184.9
+  b_first_trade_to_decision_ms     p50=4753.3  p95=5938.4  p99=6073.1
+  b_last_trade_to_decision_ms      p50=1905.2  p95=5302.0  p99=5886.6
+    stage bar_close_to_bar_emitted   p50=1032.3  p95=1107.8
+    stage kafka_bars_to_inference    p50=12.9  p95=65.7
+    stage features                   p50=4.2  p95=9.1
+    stage model_forward              p50=2.8  p95=5.1
+    stage features_to_done           p50=3.1  p95=6.5
+  NTP offset used 97.5 ms; target p95 (a) < 5000 ms: PASS

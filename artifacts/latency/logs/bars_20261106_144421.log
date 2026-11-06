@@ -1,0 +1,61 @@
+/Users/elvisle/pnd-thesis/src/pipeline/python_bars.py:157: DeprecationWarning: value_deserializer does not implement kafka.serializer.Deserializer
+  consumer = KafkaConsumer(
+/Users/elvisle/pnd-thesis/src/pipeline/python_bars.py:198: DeprecationWarning: value_serializer does not implement kafka.serializer.Serializer
+  main()
+Python bars aggregator (adaptive cleaning) running on raw-trades -> bars
+  500 bars emitted, last: LINKUSDT 2026-11-06T07:47:15+00:00  removed_ticks=2 late=0
+  1000 bars emitted, last: XRPUSDT 2026-11-06T07:50:15+00:00  removed_ticks=2 late=0
+  1500 bars emitted, last: TRXUSDT 2026-11-06T07:53:05+00:00  removed_ticks=2 late=0
+  2000 bars emitted, last: XRPUSDT 2026-11-06T07:56:10+00:00  removed_ticks=4 late=0
+  2500 bars emitted, last: AVAXUSDT 2026-11-06T07:59:20+00:00  removed_ticks=4 late=0
+  3000 bars emitted, last: BCHUSDT 2026-11-06T08:02:10+00:00  removed_ticks=4 late=0
+  3500 bars emitted, last: DOGEUSDT 2026-11-06T08:05:10+00:00  removed_ticks=5 late=0
+  4000 bars emitted, last: LTCUSDT 2026-11-06T08:08:05+00:00  removed_ticks=5 late=0
+  4500 bars emitted, last: BCHUSDT 2026-11-06T08:11:05+00:00  removed_ticks=6 late=0
+  5000 bars emitted, last: ARBUSDT 2026-11-06T08:14:05+00:00  removed_ticks=7 late=0
+  5500 bars emitted, last: XRPUSDT 2026-11-06T08:17:10+00:00  removed_ticks=9 late=0
+  6000 bars emitted, last: BNBUSDT 2026-11-06T08:20:10+00:00  removed_ticks=11 late=0
+  6500 bars emitted, last: OPUSDT 2026-11-06T08:23:00+00:00  removed_ticks=12 late=0
+  7000 bars emitted, last: TRXUSDT 2026-11-06T08:26:10+00:00  removed_ticks=15 late=0
+  7500 bars emitted, last: OPUSDT 2026-11-06T08:29:30+00:00  removed_ticks=19 late=0
+  8000 bars emitted, last: APTUSDT 2026-11-06T08:32:40+00:00  removed_ticks=20 late=0
+  8500 bars emitted, last: XRPUSDT 2026-11-06T08:36:00+00:00  removed_ticks=21 late=0
+  9000 bars emitted, last: BTCUSDT 2026-11-06T08:39:10+00:00  removed_ticks=21 late=0
+  9500 bars emitted, last: FILUSDT 2026-11-06T08:42:20+00:00  removed_ticks=21 late=0
+  10000 bars emitted, last: ETHUSDT 2026-11-06T08:45:45+00:00  removed_ticks=22 late=0
+  10500 bars emitted, last: BCHUSDT 2026-11-06T08:49:05+00:00  removed_ticks=22 late=0
+  11000 bars emitted, last: ETHUSDT 2026-11-06T08:52:45+00:00  removed_ticks=26 late=0
+  11500 bars emitted, last: BNBUSDT 2026-11-06T08:56:20+00:00  removed_ticks=27 late=0
+  12000 bars emitted, last: BNBUSDT 2026-11-06T09:00:00+00:00  removed_ticks=36 late=0
+  12500 bars emitted, last: BNBUSDT 2026-11-06T09:03:05+00:00  removed_ticks=36 late=0
+  13000 bars emitted, last: ADAUSDT 2026-11-06T09:06:00+00:00  removed_ticks=38 late=0
+  13500 bars emitted, last: BTCUSDT 2026-11-06T09:08:55+00:00  removed_ticks=42 late=0
+  14000 bars emitted, last: BNBUSDT 2026-11-06T09:12:05+00:00  removed_ticks=42 late=0
+  14500 bars emitted, last: LTCUSDT 2026-11-06T09:15:20+00:00  removed_ticks=42 late=0
+  15000 bars emitted, last: NEARUSDT 2026-11-06T09:18:20+00:00  removed_ticks=43 late=0
+  15500 bars emitted, last: BTCUSDT 2026-11-06T09:21:40+00:00  removed_ticks=43 late=0
+  16000 bars emitted, last: BTCUSDT 2026-11-06T09:25:00+00:00  removed_ticks=43 late=0
+  16500 bars emitted, last: NEARUSDT 2026-11-06T09:28:15+00:00  removed_ticks=45 late=0
+  17000 bars emitted, last: FILUSDT 2026-11-06T09:31:25+00:00  removed_ticks=45 late=0
+  17500 bars emitted, last: BCHUSDT 2026-11-06T09:34:30+00:00  removed_ticks=45 late=0
+  18000 bars emitted, last: APTUSDT 2026-11-06T09:37:40+00:00  removed_ticks=45 late=0
+  18500 bars emitted, last: LTCUSDT 2026-11-06T09:41:00+00:00  removed_ticks=45 late=0
+  19000 bars emitted, last: LTCUSDT 2026-11-06T09:44:25+00:00  removed_ticks=45 late=0
+  19500 bars emitted, last: LINKUSDT 2026-11-06T09:47:50+00:00  removed_ticks=45 late=0
+  20000 bars emitted, last: AVAXUSDT 2026-11-06T09:51:20+00:00  removed_ticks=45 late=0
+  20500 bars emitted, last: ARBUSDT 2026-11-06T09:54:40+00:00  removed_ticks=45 late=0
+  21000 bars emitted, last: TRXUSDT 2026-11-06T09:57:50+00:00  removed_ticks=45 late=0
+  21500 bars emitted, last: OPUSDT 2026-11-06T10:01:00+00:00  removed_ticks=45 late=0
+  22000 bars emitted, last: FILUSDT 2026-11-06T10:04:15+00:00  removed_ticks=45 late=0
+  22500 bars emitted, last: DOGEUSDT 2026-11-06T10:07:20+00:00  removed_ticks=46 late=0
+  23000 bars emitted, last: ARBUSDT 2026-11-06T10:10:30+00:00  removed_ticks=47 late=0
+  23500 bars emitted, last: ETHUSDT 2026-11-06T10:13:50+00:00  removed_ticks=50 late=0
+  24000 bars emitted, last: XRPUSDT 2026-11-06T10:17:10+00:00  removed_ticks=58 late=0
+  24500 bars emitted, last: BNBUSDT 2026-11-06T10:20:25+00:00  removed_ticks=58 late=0
+  25000 bars emitted, last: ADAUSDT 2026-11-06T10:23:35+00:00  removed_ticks=58 late=0
+  25500 bars emitted, last: ADAUSDT 2026-11-06T10:26:40+00:00  removed_ticks=58 late=0
+  26000 bars emitted, last: BNBUSDT 2026-11-06T10:29:55+00:00  removed_ticks=58 late=0
+  26500 bars emitted, last: ETHUSDT 2026-11-06T10:33:05+00:00  removed_ticks=58 late=0
+  27000 bars emitted, last: ARBUSDT 2026-11-06T10:36:05+00:00  removed_ticks=58 late=0
+  27500 bars emitted, last: SOLUSDT 2026-11-06T10:39:10+00:00  removed_ticks=58 late=0
+  28000 bars emitted, last: BNBUSDT 2026-11-06T10:42:20+00:00  removed_ticks=58 late=0

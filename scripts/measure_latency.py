@@ -261,7 +261,7 @@ def main() -> None:
                       f"#{restarts[name]}", flush=True)
                 start(name)
         if time.time() - last_report > 600 and os.path.exists(samples):
-            n = sum(1 for _ in open(samples)) - 1
+            n = max(sum(1 for _ in open(samples)) - 1, 0)
             print(f"[latency] {dt.datetime.now():%H:%M} {n} bars scored, "
                   f"{(t_end - time.time()) / 60:.0f} min left", flush=True)
             last_report = time.time()

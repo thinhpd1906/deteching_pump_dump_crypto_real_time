@@ -1,0 +1,625 @@
+/Users/elvisle/pnd-thesis/src/pipeline/inference_service.py:155: DeprecationWarning: value_deserializer does not implement kafka.serializer.Deserializer
+  consumer = KafkaConsumer(
+/Users/elvisle/pnd-thesis/src/pipeline/inference_service.py:234: DeprecationWarning: value_serializer does not implement kafka.serializer.Serializer
+  main()
+Inference service: model=at_pre_lf10_s0 thr=0.5340 win=120 dev=cpu
+  Watching: ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'DOGEUSDT', 'ADAUSDT', 'TRXUSDT', 'LINKUSDT', 'AVAXUSDT', 'LTCUSDT', 'DOTUSDT', 'BCHUSDT', 'ATOMUSDT', 'ETCUSDT', 'FILUSDT', 'NEARUSDT', 'APTUSDT', 'ARBUSDT', 'OPUSDT']
+  Consuming topic: bars
+07:40:20 SOLUSDT      score=0.4352 close->done=218ms (p50=0ms p95=0ms)
+07:40:20 BTCUSDT      score=0.5506 close->done=1007ms (p50=0ms p95=0ms)  *** ALERT ***
+07:40:20 NEARUSDT     score=0.4369 close->done=1018ms (p50=0ms p95=0ms)
+07:40:20 BNBUSDT      score=0.4676 close->done=1025ms (p50=0ms p95=0ms)
+07:40:20 LTCUSDT      score=0.3987 close->done=1030ms (p50=0ms p95=0ms)
+07:40:25 ETHUSDT      score=0.6106 close->done=26ms (p50=0ms p95=0ms)  *** ALERT ***
+07:40:25 BTCUSDT      score=0.5726 close->done=57ms (p50=0ms p95=0ms)  *** ALERT ***
+07:40:25 XRPUSDT      score=0.5628 close->done=265ms (p50=0ms p95=0ms)  *** ALERT ***
+07:40:25 SOLUSDT      score=0.4455 close->done=458ms (p50=0ms p95=0ms)
+07:40:25 LINKUSDT     score=0.4110 close->done=519ms (p50=0ms p95=0ms)
+07:40:25 FILUSDT      score=0.4160 close->done=586ms (p50=519ms p95=1027ms)
+07:40:25 NEARUSDT     score=0.4197 close->done=878ms (p50=552ms p95=1027ms)
+07:40:25 BNBUSDT      score=0.4559 close->done=981ms (p50=586ms p95=1027ms)
+07:40:25 LTCUSDT      score=0.3955 close->done=988ms (p50=732ms p95=1027ms)
+07:40:25 AVAXUSDT     score=0.4196 close->done=993ms (p50=878ms p95=1026ms)
+07:40:25 BCHUSDT      score=0.4226 close->done=999ms (p50=930ms p95=1026ms)
+07:40:25 ARBUSDT      score=0.4603 close->done=1003ms (p50=981ms p95=1026ms)
+07:40:25 DOGEUSDT     score=0.4840 close->done=1008ms (p50=985ms p95=1025ms)
+07:40:25 TRXUSDT      score=0.4380 close->done=1012ms (p50=988ms p95=1025ms)
+07:40:30 LINKUSDT     score=0.4289 close->done=4ms (p50=985ms p95=1025ms)
+07:40:30 BTCUSDT      score=0.5950 close->done=39ms (p50=981ms p95=1025ms)  *** ALERT ***
+07:40:30 SOLUSDT      score=0.4884 close->done=48ms (p50=930ms p95=1024ms)
+07:40:30 DOGEUSDT     score=0.5411 close->done=94ms (p50=878ms p95=1024ms)  *** ALERT ***
+07:40:30 ETHUSDT      score=0.6214 close->done=104ms (p50=732ms p95=1024ms)  *** ALERT ***
+07:40:30 AVAXUSDT     score=0.4145 close->done=245ms (p50=586ms p95=1023ms)
+07:40:30 NEARUSDT     score=0.4561 close->done=583ms (p50=585ms p95=1023ms)
+07:40:30 FILUSDT      score=0.4138 close->done=652ms (p50=586ms p95=1023ms)
+07:40:30 APTUSDT      score=0.4195 close->done=660ms (p50=619ms p95=1022ms)
+07:40:30 XRPUSDT      score=0.5930 close->done=668ms (p50=652ms p95=1022ms)  *** ALERT ***
+07:40:30 BNBUSDT      score=0.4739 close->done=673ms (p50=656ms p95=1022ms)
+07:40:30 LTCUSDT      score=0.4030 close->done=708ms (p50=660ms p95=1021ms)
+07:40:30 ARBUSDT      score=0.5119 close->done=751ms (p50=664ms p95=1021ms)
+07:40:30 BCHUSDT      score=0.4240 close->done=759ms (p50=668ms p95=1021ms)
+07:40:30 ADAUSDT      score=0.4463 close->done=772ms (p50=670ms p95=1020ms)
+07:40:30 OPUSDT       score=0.4142 close->done=902ms (p50=673ms p95=1020ms)
+07:40:30 TRXUSDT      score=0.4639 close->done=908ms (p50=691ms p95=1020ms)
+07:40:30 ETCUSDT      score=0.4109 close->done=913ms (p50=708ms p95=1019ms)
+07:40:35 ETHUSDT      score=0.6259 close->done=13ms (p50=691ms p95=1019ms)  *** ALERT ***
+07:40:35 BNBUSDT      score=0.5206 close->done=22ms (p50=673ms p95=1019ms)
+07:40:35 BTCUSDT      score=0.6065 close->done=47ms (p50=670ms p95=1018ms)  *** ALERT ***
+07:40:35 DOGEUSDT     score=0.5298 close->done=186ms (p50=668ms p95=1018ms)
+07:40:35 LINKUSDT     score=0.4413 close->done=198ms (p50=664ms p95=1018ms)
+07:40:35 AVAXUSDT     score=0.4209 close->done=206ms (p50=660ms p95=1017ms)
+07:40:35 FILUSDT      score=0.4205 close->done=214ms (p50=656ms p95=1017ms)
+07:40:35 DOTUSDT      score=0.4063 close->done=220ms (p50=652ms p95=1017ms)
+07:40:35 SOLUSDT      score=0.4885 close->done=225ms (p50=619ms p95=1017ms)
+07:40:35 XRPUSDT      score=0.6341 close->done=233ms (p50=586ms p95=1016ms)  *** ALERT ***
+07:40:35 ARBUSDT      score=0.4953 close->done=241ms (p50=585ms p95=1016ms)
+07:40:35 TRXUSDT      score=0.4559 close->done=267ms (p50=583ms p95=1016ms)
+07:40:35 OPUSDT       score=0.4195 close->done=289ms (p50=551ms p95=1015ms)
+07:40:35 APTUSDT      score=0.4289 close->done=314ms (p50=519ms p95=1015ms)
+07:40:35 NEARUSDT     score=0.4710 close->done=636ms (p50=551ms p95=1015ms)
+07:40:35 LTCUSDT      score=0.4125 close->done=918ms (p50=583ms p95=1015ms)
+07:40:35 BCHUSDT      score=0.4287 close->done=926ms (p50=585ms p95=1014ms)
+07:40:35 ADAUSDT      score=0.4591 close->done=932ms (p50=586ms p95=1014ms)
+07:40:35 ETCUSDT      score=0.4156 close->done=939ms (p50=611ms p95=1014ms)
+07:40:35 ATOMUSDT     score=0.4057 close->done=944ms (p50=636ms p95=1014ms)
+07:40:40 BTCUSDT      score=0.6049 close->done=131ms (p50=611ms p95=1013ms)  *** ALERT ***
+07:40:40 SOLUSDT      score=0.4936 close->done=325ms (p50=586ms p95=1013ms)
+07:40:40 ETHUSDT      score=0.6293 close->done=360ms (p50=585ms p95=1013ms)  *** ALERT ***
+07:40:40 LINKUSDT     score=0.4388 close->done=382ms (p50=583ms p95=1012ms)
+07:40:40 XRPUSDT      score=0.6406 close->done=512ms (p50=551ms p95=1012ms)  *** ALERT ***
+07:40:40 LTCUSDT      score=0.4072 close->done=519ms (p50=519ms p95=1012ms)
+07:40:40 NEARUSDT     score=0.5000 close->done=584ms (p50=551ms p95=1012ms)
+07:40:40 BNBUSDT      score=0.5259 close->done=944ms (p50=583ms p95=1012ms)
+07:40:40 AVAXUSDT     score=0.4166 close->done=952ms (p50=584ms p95=1011ms)
+07:40:40 BCHUSDT      score=0.4131 close->done=961ms (p50=584ms p95=1011ms)
+07:40:40 ARBUSDT      score=0.5008 close->done=968ms (p50=585ms p95=1011ms)
+07:40:40 OPUSDT       score=0.4132 close->done=975ms (p50=586ms p95=1011ms)
+07:40:40 DOGEUSDT     score=0.4943 close->done=982ms (p50=611ms p95=1010ms)
+07:40:40 TRXUSDT      score=0.4774 close->done=987ms (p50=636ms p95=1010ms)
+07:40:40 DOTUSDT      score=0.4143 close->done=993ms (p50=644ms p95=1010ms)
+07:40:40 FILUSDT      score=0.4239 close->done=998ms (p50=652ms p95=1010ms)
+07:40:40 APTUSDT      score=0.4366 close->done=1003ms (p50=656ms p95=1009ms)
+07:40:40 ADAUSDT      score=0.4556 close->done=1007ms (p50=660ms p95=1009ms)
+07:40:45 ETHUSDT      score=0.6290 close->done=-10ms (p50=656ms p95=1009ms)  *** ALERT ***
+07:40:45 BTCUSDT      score=0.6054 close->done=15ms (p50=652ms p95=1009ms)  *** ALERT ***
+07:40:45 LINKUSDT     score=0.4420 close->done=23ms (p50=644ms p95=1008ms)
+07:40:45 LTCUSDT      score=0.3991 close->done=239ms (p50=636ms p95=1008ms)
+07:40:45 XRPUSDT      score=0.6261 close->done=319ms (p50=611ms p95=1008ms)  *** ALERT ***
+07:40:45 BNBUSDT      score=0.5219 close->done=370ms (p50=586ms p95=1008ms)
+07:40:45 TRXUSDT      score=0.4706 close->done=471ms (p50=585ms p95=1008ms)
+07:40:45 FILUSDT      score=0.4282 close->done=493ms (p50=584ms p95=1008ms)
+07:40:45 DOGEUSDT     score=0.5640 close->done=502ms (p50=584ms p95=1008ms)  *** ALERT ***
+07:40:45 SOLUSDT      score=0.5257 close->done=517ms (p50=583ms p95=1008ms)
+07:40:45 ADAUSDT      score=0.4648 close->done=781ms (p50=584ms p95=1008ms)
+07:40:45 NEARUSDT     score=0.5076 close->done=893ms (p50=584ms p95=1008ms)
+07:40:45 AVAXUSDT     score=0.4145 close->done=899ms (p50=585ms p95=1008ms)
+07:40:45 BCHUSDT      score=0.4258 close->done=905ms (p50=586ms p95=1008ms)
+07:40:45 ARBUSDT      score=0.5172 close->done=911ms (p50=611ms p95=1008ms)
+07:40:45 OPUSDT       score=0.4142 close->done=916ms (p50=636ms p95=1007ms)
+07:40:45 DOTUSDT      score=0.4185 close->done=923ms (p50=644ms p95=1007ms)
+07:40:45 APTUSDT      score=0.4183 close->done=930ms (p50=652ms p95=1007ms)
+07:40:45 ETCUSDT      score=0.4097 close->done=936ms (p50=656ms p95=1007ms)
+07:40:50 BTCUSDT      score=0.6113 close->done=496ms (p50=652ms p95=1007ms)  *** ALERT ***
+07:40:50 BNBUSDT      score=0.5047 close->done=680ms (p50=656ms p95=1007ms)
+07:40:50 XRPUSDT      score=0.6254 close->done=820ms (p50=660ms p95=1007ms)  *** ALERT ***
+07:40:50 ETHUSDT      score=0.6350 close->done=855ms (p50=664ms p95=1007ms)  *** ALERT ***
+07:40:50 AVAXUSDT     score=0.4448 close->done=864ms (p50=668ms p95=1007ms)
+07:40:50 LINKUSDT     score=0.4506 close->done=872ms (p50=670ms p95=1007ms)
+07:40:50 LTCUSDT      score=0.4016 close->done=878ms (p50=673ms p95=1007ms)
+07:40:50 SOLUSDT      score=0.5417 close->done=888ms (p50=677ms p95=1007ms)  *** ALERT ***
+07:40:50 NEARUSDT     score=0.4733 close->done=896ms (p50=680ms p95=1007ms)
+07:40:50 BCHUSDT      score=0.4393 close->done=903ms (p50=694ms p95=1007ms)
+07:40:50 ARBUSDT      score=0.4819 close->done=908ms (p50=708ms p95=1007ms)
+07:40:50 OPUSDT       score=0.4147 close->done=913ms (p50=730ms p95=1007ms)
+07:40:50 DOGEUSDT     score=0.5498 close->done=919ms (p50=751ms p95=1007ms)  *** ALERT ***
+07:40:50 TRXUSDT      score=0.4900 close->done=924ms (p50=755ms p95=1007ms)
+07:40:50 DOTUSDT      score=0.4092 close->done=929ms (p50=759ms p95=1007ms)
+07:40:50 FILUSDT      score=0.4225 close->done=935ms (p50=766ms p95=1007ms)
+07:40:50 APTUSDT      score=0.4176 close->done=940ms (p50=772ms p95=1007ms)
+07:40:50 ADAUSDT      score=0.4634 close->done=946ms (p50=777ms p95=1007ms)
+07:40:50 ETCUSDT      score=0.4113 close->done=951ms (p50=781ms p95=1007ms)
+07:40:55 ETHUSDT      score=0.6339 close->done=101ms (p50=777ms p95=1007ms)  *** ALERT ***
+07:40:55 BTCUSDT      score=0.6145 close->done=113ms (p50=772ms p95=1007ms)  *** ALERT ***
+07:40:55 SOLUSDT      score=0.5374 close->done=324ms (p50=766ms p95=1007ms)  *** ALERT ***
+07:40:55 XRPUSDT      score=0.6535 close->done=365ms (p50=759ms p95=1007ms)  *** ALERT ***
+07:40:55 NEARUSDT     score=0.4738 close->done=373ms (p50=755ms p95=1007ms)
+07:40:55 BNBUSDT      score=0.5430 close->done=987ms (p50=759ms p95=1007ms)  *** ALERT ***
+07:40:55 LTCUSDT      score=0.4072 close->done=995ms (p50=766ms p95=1007ms)
+07:40:55 LINKUSDT     score=0.4646 close->done=1002ms (p50=772ms p95=1007ms)
+07:40:55 AVAXUSDT     score=0.4368 close->done=1008ms (p50=777ms p95=1007ms)
+07:40:55 BCHUSDT      score=0.4318 close->done=1014ms (p50=781ms p95=1008ms)
+07:40:55 ARBUSDT      score=0.5162 close->done=1021ms (p50=801ms p95=1008ms)
+07:40:55 DOGEUSDT     score=0.5588 close->done=1027ms (p50=820ms p95=1012ms)  *** ALERT ***
+07:40:55 TRXUSDT      score=0.5023 close->done=1032ms (p50=838ms p95=1014ms)
+07:40:55 FILUSDT      score=0.4292 close->done=1038ms (p50=855ms p95=1017ms)
+07:40:55 APTUSDT      score=0.4259 close->done=1043ms (p50=860ms p95=1020ms)
+07:40:55 ADAUSDT      score=0.4484 close->done=1047ms (p50=864ms p95=1023ms)
+07:40:55 ETCUSDT      score=0.4180 close->done=1052ms (p50=868ms p95=1026ms)
+07:41:00 DOGEUSDT     score=0.5678 close->done=5ms (p50=864ms p95=1026ms)  *** ALERT ***
+07:41:00 BTCUSDT      score=0.6168 close->done=49ms (p50=860ms p95=1026ms)  *** ALERT ***
+07:41:00 BNBUSDT      score=0.5265 close->done=59ms (p50=855ms p95=1026ms)
+07:41:00 ETHUSDT      score=0.6336 close->done=74ms (p50=838ms p95=1025ms)  *** ALERT ***
+07:41:00 LINKUSDT     score=0.5024 close->done=82ms (p50=820ms p95=1025ms)
+07:41:00 SOLUSDT      score=0.5278 close->done=94ms (p50=801ms p95=1025ms)
+07:41:00 XRPUSDT      score=0.6577 close->done=306ms (p50=781ms p95=1025ms)  *** ALERT ***
+07:41:00 NEARUSDT     score=0.4698 close->done=924ms (p50=801ms p95=1025ms)
+07:41:00 LTCUSDT      score=0.4107 close->done=933ms (p50=820ms p95=1025ms)
+07:41:00 AVAXUSDT     score=0.4420 close->done=939ms (p50=838ms p95=1025ms)
+07:41:00 BCHUSDT      score=0.4434 close->done=945ms (p50=855ms p95=1025ms)
+07:41:00 ARBUSDT      score=0.5249 close->done=951ms (p50=860ms p95=1024ms)
+07:41:00 OPUSDT       score=0.4268 close->done=956ms (p50=864ms p95=1024ms)
+07:41:00 TRXUSDT      score=0.4999 close->done=961ms (p50=868ms p95=1024ms)
+07:41:00 DOTUSDT      score=0.4183 close->done=966ms (p50=872ms p95=1024ms)
+07:41:00 FILUSDT      score=0.4294 close->done=971ms (p50=875ms p95=1024ms)
+07:41:00 APTUSDT      score=0.4328 close->done=977ms (p50=878ms p95=1023ms)
+07:41:00 ADAUSDT      score=0.4614 close->done=982ms (p50=878ms p95=1023ms)
+07:41:00 ETCUSDT      score=0.4108 close->done=987ms (p50=878ms p95=1023ms)
+07:41:05 BTCUSDT      score=0.6139 close->done=118ms (p50=878ms p95=1023ms)  *** ALERT ***
+07:41:05 ETHUSDT      score=0.6377 close->done=302ms (p50=878ms p95=1023ms)  *** ALERT ***
+07:41:05 XRPUSDT      score=0.6625 close->done=704ms (p50=875ms p95=1022ms)  *** ALERT ***
+07:41:05 NEARUSDT     score=0.4716 close->done=933ms (p50=878ms p95=1022ms)
+07:41:05 SOLUSDT      score=0.5106 close->done=941ms (p50=878ms p95=1022ms)
+07:41:05 BNBUSDT      score=0.5476 close->done=949ms (p50=878ms p95=1022ms)  *** ALERT ***
+07:41:05 LTCUSDT      score=0.4079 close->done=956ms (p50=883ms p95=1022ms)
+07:41:05 LINKUSDT     score=0.4645 close->done=962ms (p50=888ms p95=1021ms)
+07:41:05 AVAXUSDT     score=0.4314 close->done=968ms (p50=890ms p95=1021ms)
+07:41:05 BCHUSDT      score=0.4261 close->done=974ms (p50=893ms p95=1021ms)
+07:41:05 ARBUSDT      score=0.5301 close->done=980ms (p50=894ms p95=1021ms)
+07:41:05 OPUSDT       score=0.4219 close->done=986ms (p50=896ms p95=1021ms)
+07:41:05 DOGEUSDT     score=0.5410 close->done=993ms (p50=897ms p95=1020ms)  *** ALERT ***
+07:41:05 TRXUSDT      score=0.4695 close->done=999ms (p50=899ms p95=1020ms)
+07:41:05 DOTUSDT      score=0.4238 close->done=1004ms (p50=901ms p95=1020ms)
+07:41:05 FILUSDT      score=0.4350 close->done=1009ms (p50=902ms p95=1020ms)
+07:41:05 ADAUSDT      score=0.4726 close->done=1014ms (p50=902ms p95=1020ms)
+07:41:10 BNBUSDT      score=0.5480 close->done=17ms (p50=902ms p95=1020ms)  *** ALERT ***
+07:41:10 BTCUSDT      score=0.6157 close->done=29ms (p50=901ms p95=1020ms)  *** ALERT ***
+07:41:10 ETHUSDT      score=0.6406 close->done=72ms (p50=899ms p95=1019ms)  *** ALERT ***
+07:41:10 XRPUSDT      score=0.6682 close->done=441ms (p50=897ms p95=1019ms)  *** ALERT ***
+07:41:10 DOGEUSDT     score=0.5906 close->done=488ms (p50=896ms p95=1019ms)  *** ALERT ***
+07:41:10 SOLUSDT      score=0.5439 close->done=510ms (p50=894ms p95=1019ms)  *** ALERT ***
+07:41:10 BCHUSDT      score=0.4343 close->done=531ms (p50=893ms p95=1019ms)
+07:41:10 FILUSDT      score=0.4399 close->done=742ms (p50=890ms p95=1019ms)
+07:41:10 NEARUSDT     score=0.4808 close->done=753ms (p50=888ms p95=1019ms)
+07:41:10 LINKUSDT     score=0.4765 close->done=808ms (p50=883ms p95=1019ms)
+07:41:10 LTCUSDT      score=0.4131 close->done=911ms (p50=888ms p95=1018ms)
+07:41:10 AVAXUSDT     score=0.4343 close->done=917ms (p50=890ms p95=1018ms)
+07:41:10 ARBUSDT      score=0.5209 close->done=923ms (p50=893ms p95=1018ms)
+07:41:10 TRXUSDT      score=0.4816 close->done=928ms (p50=894ms p95=1018ms)
+07:41:10 ADAUSDT      score=0.4873 close->done=933ms (p50=896ms p95=1018ms)
+07:41:15 BTCUSDT      score=0.6126 close->done=44ms (p50=894ms p95=1018ms)  *** ALERT ***
+07:41:15 ETHUSDT      score=0.6365 close->done=54ms (p50=893ms p95=1018ms)  *** ALERT ***
+07:41:15 BNBUSDT      score=0.5452 close->done=117ms (p50=890ms p95=1017ms)  *** ALERT ***
+07:41:15 SOLUSDT      score=0.5069 close->done=155ms (p50=888ms p95=1017ms)
+07:41:15 XRPUSDT      score=0.6556 close->done=178ms (p50=883ms p95=1017ms)  *** ALERT ***
+07:41:15 LTCUSDT      score=0.4207 close->done=879ms (p50=879ms p95=1017ms)
+07:41:15 DOGEUSDT     score=0.5478 close->done=930ms (p50=884ms p95=1017ms)  *** ALERT ***
+07:41:15 NEARUSDT     score=0.4838 close->done=942ms (p50=888ms p95=1017ms)
+07:41:15 LINKUSDT     score=0.4551 close->done=949ms (p50=890ms p95=1016ms)
+07:41:15 AVAXUSDT     score=0.4361 close->done=956ms (p50=893ms p95=1016ms)
+07:41:15 BCHUSDT      score=0.4335 close->done=962ms (p50=894ms p95=1016ms)
+07:41:15 ARBUSDT      score=0.5033 close->done=967ms (p50=896ms p95=1016ms)
+07:41:15 OPUSDT       score=0.4254 close->done=973ms (p50=897ms p95=1016ms)
+07:41:15 TRXUSDT      score=0.4930 close->done=978ms (p50=899ms p95=1015ms)
+07:41:15 DOTUSDT      score=0.4181 close->done=983ms (p50=901ms p95=1015ms)
+07:41:15 FILUSDT      score=0.4228 close->done=988ms (p50=902ms p95=1015ms)
+07:41:15 APTUSDT      score=0.4312 close->done=993ms (p50=902ms p95=1015ms)
+07:41:15 ATOMUSDT     score=0.4056 close->done=997ms (p50=903ms p95=1015ms)
+07:41:20 BTCUSDT      score=0.6358 close->done=40ms (p50=902ms p95=1015ms)  *** ALERT ***
+07:41:20 ARBUSDT      score=0.5187 close->done=82ms (p50=902ms p95=1014ms)
+07:41:20 ETHUSDT      score=0.6597 close->done=356ms (p50=901ms p95=1014ms)  *** ALERT ***
+07:41:20 XRPUSDT      score=0.6702 close->done=647ms (p50=899ms p95=1014ms)  *** ALERT ***
+07:41:20 NEARUSDT     score=0.4956 close->done=957ms (p50=901ms p95=1014ms)
+07:41:20 SOLUSDT      score=0.5665 close->done=965ms (p50=902ms p95=1014ms)  *** ALERT ***
+07:41:20 BNBUSDT      score=0.5530 close->done=973ms (p50=902ms p95=1014ms)  *** ALERT ***
+07:41:20 LTCUSDT      score=0.4095 close->done=979ms (p50=903ms p95=1014ms)
+07:41:20 LINKUSDT     score=0.4592 close->done=985ms (p50=904ms p95=1014ms)
+07:41:20 AVAXUSDT     score=0.4198 close->done=990ms (p50=905ms p95=1014ms)
+07:41:20 BCHUSDT      score=0.4339 close->done=995ms (p50=906ms p95=1014ms)
+07:41:20 OPUSDT       score=0.4164 close->done=1001ms (p50=908ms p95=1014ms)
+07:41:20 DOGEUSDT     score=0.5521 close->done=1008ms (p50=908ms p95=1014ms)  *** ALERT ***
+07:41:20 TRXUSDT      score=0.4702 close->done=1014ms (p50=908ms p95=1014ms)
+07:41:20 DOTUSDT      score=0.4038 close->done=1019ms (p50=909ms p95=1016ms)
+07:41:20 FILUSDT      score=0.4214 close->done=1024ms (p50=911ms p95=1018ms)
+07:41:20 APTUSDT      score=0.4242 close->done=1029ms (p50=911ms p95=1020ms)
+07:41:20 ADAUSDT      score=0.4731 close->done=1034ms (p50=911ms p95=1021ms)
+07:41:20 ETCUSDT      score=0.4115 close->done=1039ms (p50=912ms p95=1024ms)
+07:41:25 BTCUSDT      score=0.6402 close->done=165ms (p50=911ms p95=1024ms)  *** ALERT ***
+07:41:25 DOGEUSDT     score=0.5573 close->done=190ms (p50=911ms p95=1024ms)  *** ALERT ***
+07:41:25 ETHUSDT      score=0.6649 close->done=205ms (p50=911ms p95=1024ms)  *** ALERT ***
+07:41:25 XRPUSDT      score=0.6741 close->done=522ms (p50=909ms p95=1024ms)  *** ALERT ***
+07:41:25 BNBUSDT      score=0.5598 close->done=646ms (p50=908ms p95=1024ms)  *** ALERT ***
+07:41:25 LINKUSDT     score=0.4552 close->done=654ms (p50=908ms p95=1024ms)
+07:41:25 NEARUSDT     score=0.4976 close->done=676ms (p50=908ms p95=1023ms)
+07:41:25 AVAXUSDT     score=0.4323 close->done=685ms (p50=906ms p95=1023ms)
+07:41:25 ARBUSDT      score=0.5533 close->done=703ms (p50=905ms p95=1023ms)  *** ALERT ***
+07:41:25 SOLUSDT      score=0.5721 close->done=788ms (p50=904ms p95=1023ms)  *** ALERT ***
+07:41:25 FILUSDT      score=0.4305 close->done=878ms (p50=903ms p95=1023ms)
+07:41:25 ADAUSDT      score=0.4643 close->done=887ms (p50=902ms p95=1023ms)
+07:41:25 LTCUSDT      score=0.4137 close->done=908ms (p50=903ms p95=1022ms)
+07:41:25 BCHUSDT      score=0.4490 close->done=914ms (p50=904ms p95=1022ms)
+07:41:25 TRXUSDT      score=0.4600 close->done=918ms (p50=905ms p95=1022ms)
+07:41:25 APTUSDT      score=0.4373 close->done=923ms (p50=906ms p95=1022ms)
+07:41:25 ETCUSDT      score=0.4142 close->done=928ms (p50=908ms p95=1022ms)
+07:41:25 ATOMUSDT     score=0.4104 close->done=933ms (p50=908ms p95=1021ms)
+07:41:30 ETHUSDT      score=0.6439 close->done=25ms (p50=908ms p95=1021ms)  *** ALERT ***
+07:41:30 BNBUSDT      score=0.5395 close->done=43ms (p50=906ms p95=1021ms)  *** ALERT ***
+07:41:30 ARBUSDT      score=0.5360 close->done=95ms (p50=905ms p95=1021ms)  *** ALERT ***
+07:41:30 BTCUSDT      score=0.6185 close->done=120ms (p50=904ms p95=1021ms)  *** ALERT ***
+07:41:30 TRXUSDT      score=0.4534 close->done=636ms (p50=903ms p95=1021ms)
+07:41:30 LTCUSDT      score=0.4185 close->done=811ms (p50=902ms p95=1020ms)
+07:41:30 BCHUSDT      score=0.4362 close->done=821ms (p50=902ms p95=1020ms)
+07:41:30 XRPUSDT      score=0.6608 close->done=922ms (p50=902ms p95=1020ms)  *** ALERT ***
+07:41:30 NEARUSDT     score=0.4947 close->done=933ms (p50=903ms p95=1020ms)
+07:41:30 SOLUSDT      score=0.5210 close->done=940ms (p50=904ms p95=1020ms)
+07:41:30 LINKUSDT     score=0.4440 close->done=946ms (p50=905ms p95=1020ms)
+07:41:30 AVAXUSDT     score=0.4303 close->done=952ms (p50=906ms p95=1020ms)
+07:41:30 DOGEUSDT     score=0.5744 close->done=959ms (p50=908ms p95=1020ms)  *** ALERT ***
+07:41:30 FILUSDT      score=0.4191 close->done=965ms (p50=908ms p95=1020ms)
+07:41:30 APTUSDT      score=0.4129 close->done=970ms (p50=908ms p95=1020ms)
+07:41:30 ADAUSDT      score=0.4640 close->done=975ms (p50=908ms p95=1020ms)
+07:41:30 ATOMUSDT     score=0.4043 close->done=980ms (p50=908ms p95=1020ms)
+07:41:35 BTCUSDT      score=0.6153 close->done=16ms (p50=908ms p95=1020ms)  *** ALERT ***
+07:41:35 ETHUSDT      score=0.6395 close->done=173ms (p50=908ms p95=1020ms)  *** ALERT ***
+07:41:35 LINKUSDT     score=0.4564 close->done=183ms (p50=908ms p95=1020ms)
+07:41:35 SOLUSDT      score=0.5117 close->done=194ms (p50=908ms p95=1020ms)
+07:41:35 XRPUSDT      score=0.6327 close->done=524ms (p50=906ms p95=1020ms)  *** ALERT ***
+07:41:35 BNBUSDT      score=0.5678 close->done=564ms (p50=905ms p95=1020ms)  *** ALERT ***
+07:41:35 APTUSDT      score=0.4112 close->done=841ms (p50=904ms p95=1020ms)
+07:41:35 NEARUSDT     score=0.4712 close->done=945ms (p50=905ms p95=1019ms)
+07:41:35 LTCUSDT      score=0.4099 close->done=952ms (p50=906ms p95=1019ms)
+07:41:35 AVAXUSDT     score=0.4396 close->done=958ms (p50=908ms p95=1019ms)
+07:41:35 BCHUSDT      score=0.4321 close->done=964ms (p50=908ms p95=1019ms)
+07:41:35 ARBUSDT      score=0.5539 close->done=971ms (p50=908ms p95=1019ms)  *** ALERT ***
+07:41:35 DOGEUSDT     score=0.5578 close->done=978ms (p50=908ms p95=1019ms)  *** ALERT ***
+07:41:35 TRXUSDT      score=0.4634 close->done=983ms (p50=908ms p95=1019ms)
+07:41:35 DOTUSDT      score=0.4023 close->done=988ms (p50=909ms p95=1019ms)
+07:41:35 FILUSDT      score=0.4176 close->done=993ms (p50=911ms p95=1019ms)
+07:41:40 FILUSDT      score=0.4297 close->done=159ms (p50=909ms p95=1019ms)
+07:41:40 BTCUSDT      score=0.6177 close->done=171ms (p50=908ms p95=1019ms)  *** ALERT ***
+07:41:40 ETHUSDT      score=0.6477 close->done=447ms (p50=908ms p95=1019ms)  *** ALERT ***
+07:41:40 NEARUSDT     score=0.4786 close->done=987ms (p50=908ms p95=1018ms)
+07:41:40 SOLUSDT      score=0.5493 close->done=996ms (p50=909ms p95=1018ms)  *** ALERT ***
+07:41:40 BNBUSDT      score=0.5281 close->done=1003ms (p50=911ms p95=1018ms)
+07:41:40 LTCUSDT      score=0.4293 close->done=1009ms (p50=911ms p95=1018ms)
+07:41:40 XRPUSDT      score=0.6541 close->done=1017ms (p50=911ms p95=1018ms)  *** ALERT ***
+07:41:40 LINKUSDT     score=0.4431 close->done=1023ms (p50=912ms p95=1020ms)
+07:41:40 AVAXUSDT     score=0.4383 close->done=1028ms (p50=913ms p95=1021ms)
+07:41:40 BCHUSDT      score=0.4348 close->done=1033ms (p50=913ms p95=1023ms)
+07:41:40 ARBUSDT      score=0.5769 close->done=1039ms (p50=913ms p95=1024ms)  *** ALERT ***
+07:41:40 OPUSDT       score=0.4216 close->done=1045ms (p50=913ms p95=1025ms)
+07:41:40 DOGEUSDT     score=0.5429 close->done=1052ms (p50=914ms p95=1027ms)  *** ALERT ***
+07:41:40 TRXUSDT      score=0.4614 close->done=1057ms (p50=915ms p95=1028ms)
+07:41:40 APTUSDT      score=0.4215 close->done=1062ms (p50=916ms p95=1029ms)
+07:41:40 ADAUSDT      score=0.4556 close->done=1068ms (p50=916ms p95=1030ms)
+07:41:45 ETHUSDT      score=0.6353 close->done=22ms (p50=916ms p95=1030ms)  *** ALERT ***
+07:41:45 BCHUSDT      score=0.4362 close->done=38ms (p50=915ms p95=1030ms)
+07:41:45 BTCUSDT      score=0.6079 close->done=193ms (p50=914ms p95=1030ms)  *** ALERT ***
+07:41:45 XRPUSDT      score=0.6434 close->done=760ms (p50=913ms p95=1030ms)  *** ALERT ***
+07:41:45 NEARUSDT     score=0.4936 close->done=929ms (p50=914ms p95=1030ms)
+07:41:45 SOLUSDT      score=0.5575 close->done=940ms (p50=915ms p95=1030ms)  *** ALERT ***
+07:41:45 BNBUSDT      score=0.5327 close->done=948ms (p50=916ms p95=1030ms)
+07:41:45 LTCUSDT      score=0.4316 close->done=954ms (p50=916ms p95=1030ms)
+07:41:45 LINKUSDT     score=0.4526 close->done=960ms (p50=917ms p95=1029ms)
+07:41:45 AVAXUSDT     score=0.4403 close->done=966ms (p50=917ms p95=1029ms)
+07:41:45 DOGEUSDT     score=0.5663 close->done=973ms (p50=918ms p95=1029ms)  *** ALERT ***
+07:41:45 TRXUSDT      score=0.4756 close->done=978ms (p50=918ms p95=1029ms)
+07:41:45 FILUSDT      score=0.4314 close->done=983ms (p50=918ms p95=1029ms)
+07:41:45 ADAUSDT      score=0.4726 close->done=987ms (p50=919ms p95=1029ms)
+07:41:50 DOGEUSDT     score=0.5685 close->done=391ms (p50=918ms p95=1029ms)  *** ALERT ***
+07:41:50 LINKUSDT     score=0.4379 close->done=438ms (p50=918ms p95=1029ms)
+07:41:50 BTCUSDT      score=0.6035 close->done=471ms (p50=918ms p95=1029ms)  *** ALERT ***
+07:41:50 ETHUSDT      score=0.6261 close->done=529ms (p50=917ms p95=1029ms)  *** ALERT ***
+07:41:50 XRPUSDT      score=0.6521 close->done=848ms (p50=917ms p95=1029ms)  *** ALERT ***
+07:41:50 NEARUSDT     score=0.4837 close->done=970ms (p50=917ms p95=1029ms)
+07:41:50 SOLUSDT      score=0.5170 close->done=978ms (p50=918ms p95=1029ms)
+07:41:50 BNBUSDT      score=0.5378 close->done=986ms (p50=918ms p95=1029ms)  *** ALERT ***
+07:41:50 AVAXUSDT     score=0.4285 close->done=992ms (p50=918ms p95=1029ms)
+07:41:50 BCHUSDT      score=0.4222 close->done=997ms (p50=919ms p95=1029ms)
+07:41:50 ARBUSDT      score=0.5325 close->done=1003ms (p50=919ms p95=1029ms)
+07:41:50 TRXUSDT      score=0.4745 close->done=1008ms (p50=921ms p95=1029ms)
+07:41:50 FILUSDT      score=0.4248 close->done=1012ms (p50=922ms p95=1029ms)
+07:41:50 APTUSDT      score=0.4147 close->done=1017ms (p50=922ms p95=1029ms)
+07:41:50 ATOMUSDT     score=0.4142 close->done=1022ms (p50=923ms p95=1028ms)
+07:41:55 ETHUSDT      score=0.6336 close->done=16ms (p50=922ms p95=1028ms)  *** ALERT ***
+07:41:55 BTCUSDT      score=0.6038 close->done=122ms (p50=922ms p95=1028ms)  *** ALERT ***
+07:41:55 SOLUSDT      score=0.5303 close->done=674ms (p50=921ms p95=1028ms)
+07:41:55 NEARUSDT     score=0.4940 close->done=976ms (p50=922ms p95=1028ms)
+07:41:55 BNBUSDT      score=0.5188 close->done=984ms (p50=922ms p95=1028ms)
+07:41:55 XRPUSDT      score=0.6507 close->done=993ms (p50=923ms p95=1028ms)  *** ALERT ***
+07:41:55 LINKUSDT     score=0.4479 close->done=1000ms (p50=923ms p95=1028ms)
+07:41:55 AVAXUSDT     score=0.4360 close->done=1007ms (p50=923ms p95=1028ms)
+07:41:55 BCHUSDT      score=0.4268 close->done=1013ms (p50=923ms p95=1028ms)
+07:41:55 ARBUSDT      score=0.5461 close->done=1020ms (p50=923ms p95=1028ms)  *** ALERT ***
+07:41:55 DOGEUSDT     score=0.6295 close->done=1027ms (p50=924ms p95=1028ms)  *** ALERT ***
+07:41:55 TRXUSDT      score=0.4690 close->done=1032ms (p50=924ms p95=1029ms)
+07:41:55 DOTUSDT      score=0.4061 close->done=1037ms (p50=924ms p95=1030ms)
+07:41:55 FILUSDT      score=0.4278 close->done=1041ms (p50=924ms p95=1031ms)
+07:41:55 APTUSDT      score=0.4168 close->done=1046ms (p50=925ms p95=1032ms)
+07:41:55 ADAUSDT      score=0.4858 close->done=1051ms (p50=926ms p95=1033ms)
+07:42:00 ETHUSDT      score=0.6372 close->done=580ms (p50=925ms p95=1033ms)  *** ALERT ***
+07:42:00 BTCUSDT      score=0.6073 close->done=741ms (p50=924ms p95=1033ms)  *** ALERT ***
+07:42:00 SOLUSDT      score=0.5099 close->done=806ms (p50=924ms p95=1033ms)
+07:42:00 NEARUSDT     score=0.4748 close->done=911ms (p50=924ms p95=1033ms)
+07:42:00 BNBUSDT      score=0.5250 close->done=919ms (p50=924ms p95=1033ms)
+07:42:00 LTCUSDT      score=0.4107 close->done=926ms (p50=924ms p95=1033ms)
+07:42:00 XRPUSDT      score=0.6194 close->done=935ms (p50=924ms p95=1032ms)  *** ALERT ***
+07:42:00 LINKUSDT     score=0.4550 close->done=942ms (p50=924ms p95=1032ms)
+07:42:00 AVAXUSDT     score=0.4263 close->done=948ms (p50=925ms p95=1032ms)
+07:42:00 DOGEUSDT     score=0.5889 close->done=954ms (p50=926ms p95=1032ms)  *** ALERT ***
+07:42:00 TRXUSDT      score=0.5239 close->done=960ms (p50=926ms p95=1032ms)
+07:42:00 FILUSDT      score=0.4325 close->done=964ms (p50=926ms p95=1032ms)
+07:42:00 APTUSDT      score=0.4225 close->done=968ms (p50=927ms p95=1032ms)
+07:42:00 ADAUSDT      score=0.4505 close->done=974ms (p50=928ms p95=1032ms)
+07:42:05 ETHUSDT      score=0.6514 close->done=17ms (p50=927ms p95=1032ms)  *** ALERT ***
+07:42:05 BTCUSDT      score=0.6185 close->done=32ms (p50=926ms p95=1032ms)  *** ALERT ***
+07:42:05 LINKUSDT     score=0.4540 close->done=419ms (p50=926ms p95=1032ms)
+07:42:05 BNBUSDT      score=0.5114 close->done=581ms (p50=926ms p95=1032ms)
+07:42:05 NEARUSDT     score=0.4853 close->done=957ms (p50=926ms p95=1032ms)
+07:42:05 SOLUSDT      score=0.5250 close->done=964ms (p50=926ms p95=1032ms)
+07:42:05 LTCUSDT      score=0.4123 close->done=970ms (p50=927ms p95=1032ms)
+07:42:05 XRPUSDT      score=0.6214 close->done=977ms (p50=928ms p95=1032ms)  *** ALERT ***
+07:42:05 AVAXUSDT     score=0.4263 close->done=983ms (p50=928ms p95=1032ms)
+07:42:05 ARBUSDT      score=0.5107 close->done=988ms (p50=928ms p95=1032ms)
+07:42:05 DOGEUSDT     score=0.5709 close->done=994ms (p50=929ms p95=1032ms)  *** ALERT ***
+07:42:05 TRXUSDT      score=0.4635 close->done=999ms (p50=929ms p95=1032ms)
+07:42:05 DOTUSDT      score=0.4066 close->done=1004ms (p50=929ms p95=1032ms)
+07:42:05 FILUSDT      score=0.4262 close->done=1010ms (p50=929ms p95=1032ms)
+07:42:05 APTUSDT      score=0.4169 close->done=1015ms (p50=929ms p95=1032ms)
+07:42:05 ADAUSDT      score=0.4786 close->done=1020ms (p50=930ms p95=1032ms)
+07:42:05 ETCUSDT      score=0.4081 close->done=1025ms (p50=930ms p95=1032ms)
+07:42:10 BTCUSDT      score=0.6181 close->done=189ms (p50=930ms p95=1032ms)  *** ALERT ***
+07:42:10 ETHUSDT      score=0.6388 close->done=615ms (p50=929ms p95=1032ms)  *** ALERT ***
+07:42:10 NEARUSDT     score=0.4951 close->done=902ms (p50=929ms p95=1032ms)
+07:42:10 SOLUSDT      score=0.5378 close->done=915ms (p50=929ms p95=1031ms)  *** ALERT ***
+07:42:10 BNBUSDT      score=0.5435 close->done=924ms (p50=929ms p95=1031ms)  *** ALERT ***
+07:42:10 LTCUSDT      score=0.4261 close->done=931ms (p50=929ms p95=1031ms)
+07:42:10 XRPUSDT      score=0.6496 close->done=939ms (p50=929ms p95=1031ms)  *** ALERT ***
+07:42:10 LINKUSDT     score=0.4488 close->done=945ms (p50=929ms p95=1031ms)
+07:42:10 BCHUSDT      score=0.4316 close->done=950ms (p50=930ms p95=1031ms)
+07:42:10 ARBUSDT      score=0.5068 close->done=955ms (p50=930ms p95=1031ms)
+07:42:10 DOGEUSDT     score=0.5673 close->done=961ms (p50=930ms p95=1031ms)  *** ALERT ***
+07:42:10 TRXUSDT      score=0.5012 close->done=966ms (p50=931ms p95=1031ms)
+07:42:10 DOTUSDT      score=0.4055 close->done=971ms (p50=931ms p95=1031ms)
+07:42:10 FILUSDT      score=0.4308 close->done=977ms (p50=932ms p95=1031ms)
+07:42:10 ADAUSDT      score=0.4698 close->done=981ms (p50=932ms p95=1031ms)
+07:42:15 ETHUSDT      score=0.6459 close->done=33ms (p50=932ms p95=1031ms)  *** ALERT ***
+07:42:15 BTCUSDT      score=0.5893 close->done=138ms (p50=931ms p95=1030ms)  *** ALERT ***
+07:42:15 XRPUSDT      score=0.6275 close->done=331ms (p50=931ms p95=1030ms)  *** ALERT ***
+07:42:15 NEARUSDT     score=0.5027 close->done=918ms (p50=930ms p95=1030ms)
+07:42:15 SOLUSDT      score=0.5206 close->done=928ms (p50=930ms p95=1030ms)
+07:42:15 BNBUSDT      score=0.5236 close->done=934ms (p50=930ms p95=1030ms)
+07:42:15 LTCUSDT      score=0.4089 close->done=942ms (p50=931ms p95=1030ms)
+07:42:15 LINKUSDT     score=0.4447 close->done=948ms (p50=931ms p95=1030ms)
+07:42:15 AVAXUSDT     score=0.4314 close->done=954ms (p50=932ms p95=1030ms)
+07:42:15 DOGEUSDT     score=0.5958 close->done=961ms (p50=932ms p95=1030ms)  *** ALERT ***
+07:42:15 TRXUSDT      score=0.4736 close->done=966ms (p50=933ms p95=1030ms)
+07:42:15 ADAUSDT      score=0.4635 close->done=971ms (p50=933ms p95=1030ms)
+07:42:20 ETHUSDT      score=0.6244 close->done=538ms (p50=933ms p95=1030ms)  *** ALERT ***
+07:42:20 AVAXUSDT     score=0.4280 close->done=557ms (p50=932ms p95=1030ms)
+07:42:20 NEARUSDT     score=0.4698 close->done=841ms (p50=932ms p95=1030ms)
+07:42:20 XRPUSDT      score=0.6387 close->done=905ms (p50=931ms p95=1030ms)  *** ALERT ***
+07:42:20 BTCUSDT      score=0.6011 close->done=915ms (p50=931ms p95=1030ms)  *** ALERT ***
+07:42:20 SOLUSDT      score=0.5174 close->done=923ms (p50=930ms p95=1029ms)
+07:42:20 BNBUSDT      score=0.5023 close->done=931ms (p50=930ms p95=1029ms)
+07:42:20 LTCUSDT      score=0.4052 close->done=937ms (p50=931ms p95=1029ms)
+07:42:20 LINKUSDT     score=0.4417 close->done=943ms (p50=931ms p95=1029ms)
+07:42:20 BCHUSDT      score=0.4313 close->done=949ms (p50=931ms p95=1029ms)
+07:42:20 ARBUSDT      score=0.5282 close->done=954ms (p50=932ms p95=1029ms)
+07:42:20 OPUSDT       score=0.4148 close->done=959ms (p50=932ms p95=1029ms)
+07:42:20 DOGEUSDT     score=0.5755 close->done=966ms (p50=933ms p95=1029ms)  *** ALERT ***
+07:42:20 TRXUSDT      score=0.4640 close->done=971ms (p50=933ms p95=1029ms)
+07:42:20 DOTUSDT      score=0.4208 close->done=976ms (p50=933ms p95=1029ms)
+07:42:20 FILUSDT      score=0.4253 close->done=981ms (p50=933ms p95=1029ms)
+07:42:20 APTUSDT      score=0.4148 close->done=986ms (p50=933ms p95=1029ms)
+07:42:20 ADAUSDT      score=0.4868 close->done=992ms (p50=933ms p95=1029ms)
+07:42:20 ETCUSDT      score=0.4082 close->done=997ms (p50=933ms p95=1029ms)
+07:42:25 BTCUSDT      score=0.6035 close->done=132ms (p50=933ms p95=1029ms)  *** ALERT ***
+07:42:25 ETHUSDT      score=0.6373 close->done=176ms (p50=933ms p95=1029ms)  *** ALERT ***
+07:42:25 XRPUSDT      score=0.6507 close->done=444ms (p50=933ms p95=1029ms)  *** ALERT ***
+07:42:25 NEARUSDT     score=0.4901 close->done=950ms (p50=933ms p95=1029ms)
+07:42:25 SOLUSDT      score=0.5125 close->done=957ms (p50=933ms p95=1029ms)
+07:42:25 BNBUSDT      score=0.5080 close->done=963ms (p50=933ms p95=1029ms)
+07:42:25 AVAXUSDT     score=0.4300 close->done=968ms (p50=933ms p95=1028ms)
+07:42:25 DOGEUSDT     score=0.5874 close->done=975ms (p50=933ms p95=1028ms)  *** ALERT ***
+07:42:25 TRXUSDT      score=0.4700 close->done=981ms (p50=933ms p95=1028ms)
+07:42:25 APTUSDT      score=0.4165 close->done=986ms (p50=934ms p95=1028ms)
+07:42:25 ADAUSDT      score=0.4447 close->done=991ms (p50=934ms p95=1028ms)
+07:42:30 BTCUSDT      score=0.6043 close->done=59ms (p50=934ms p95=1028ms)  *** ALERT ***
+07:42:30 XRPUSDT      score=0.6538 close->done=139ms (p50=933ms p95=1028ms)  *** ALERT ***
+07:42:30 NEARUSDT     score=0.5001 close->done=215ms (p50=933ms p95=1028ms)
+07:42:30 LINKUSDT     score=0.4464 close->done=383ms (p50=933ms p95=1028ms)
+07:42:30 SOLUSDT      score=0.5003 close->done=652ms (p50=933ms p95=1028ms)
+07:42:30 BNBUSDT      score=0.5261 close->done=949ms (p50=933ms p95=1028ms)
+07:42:30 LTCUSDT      score=0.4160 close->done=955ms (p50=933ms p95=1028ms)
+07:42:30 ETHUSDT      score=0.6326 close->done=962ms (p50=933ms p95=1028ms)  *** ALERT ***
+07:42:30 AVAXUSDT     score=0.4209 close->done=967ms (p50=934ms p95=1028ms)
+07:42:30 BCHUSDT      score=0.4191 close->done=973ms (p50=934ms p95=1028ms)
+07:42:30 OPUSDT       score=0.4181 close->done=978ms (p50=935ms p95=1028ms)
+07:42:30 DOGEUSDT     score=0.5728 close->done=986ms (p50=935ms p95=1028ms)  *** ALERT ***
+07:42:30 TRXUSDT      score=0.5013 close->done=991ms (p50=935ms p95=1028ms)
+07:42:30 DOTUSDT      score=0.4100 close->done=996ms (p50=935ms p95=1028ms)
+07:42:30 FILUSDT      score=0.4172 close->done=1001ms (p50=935ms p95=1028ms)
+07:42:30 ADAUSDT      score=0.4721 close->done=1006ms (p50=936ms p95=1028ms)
+07:42:35 BTCUSDT      score=0.5942 close->done=8ms (p50=935ms p95=1027ms)  *** ALERT ***
+07:42:35 XRPUSDT      score=0.6426 close->done=30ms (p50=935ms p95=1027ms)  *** ALERT ***
+07:42:35 ETHUSDT      score=0.6292 close->done=38ms (p50=935ms p95=1027ms)  *** ALERT ***
+07:42:35 ARBUSDT      score=0.5241 close->done=56ms (p50=935ms p95=1027ms)
+07:42:35 SOLUSDT      score=0.5036 close->done=218ms (p50=935ms p95=1027ms)
+07:42:35 LINKUSDT     score=0.4580 close->done=226ms (p50=934ms p95=1027ms)
+07:42:35 BNBUSDT      score=0.5252 close->done=231ms (p50=934ms p95=1027ms)
+07:42:35 AVAXUSDT     score=0.4111 close->done=237ms (p50=933ms p95=1027ms)
+07:42:35 APTUSDT      score=0.4103 close->done=358ms (p50=933ms p95=1027ms)
+07:42:35 DOGEUSDT     score=0.5836 close->done=505ms (p50=933ms p95=1027ms)  *** ALERT ***
+07:42:35 NEARUSDT     score=0.5016 close->done=948ms (p50=933ms p95=1027ms)
+07:42:35 LTCUSDT      score=0.4213 close->done=955ms (p50=933ms p95=1027ms)
+07:42:35 BCHUSDT      score=0.4254 close->done=962ms (p50=934ms p95=1027ms)
+07:42:35 TRXUSDT      score=0.5052 close->done=967ms (p50=934ms p95=1027ms)
+07:42:35 FILUSDT      score=0.4207 close->done=973ms (p50=935ms p95=1027ms)
+07:42:35 ADAUSDT      score=0.4618 close->done=978ms (p50=935ms p95=1027ms)
+07:42:40 BNBUSDT      score=0.5239 close->done=12ms (p50=935ms p95=1027ms)
+07:42:40 BTCUSDT      score=0.6097 close->done=184ms (p50=934ms p95=1027ms)  *** ALERT ***
+07:42:40 ETHUSDT      score=0.6409 close->done=268ms (p50=934ms p95=1027ms)  *** ALERT ***
+07:42:40 NEARUSDT     score=0.4767 close->done=908ms (p50=933ms p95=1027ms)
+07:42:40 SOLUSDT      score=0.5042 close->done=914ms (p50=933ms p95=1027ms)
+07:42:40 LTCUSDT      score=0.4106 close->done=920ms (p50=933ms p95=1027ms)
+07:42:40 XRPUSDT      score=0.6282 close->done=929ms (p50=933ms p95=1027ms)  *** ALERT ***
+07:42:40 LINKUSDT     score=0.4482 close->done=935ms (p50=933ms p95=1027ms)
+07:42:40 AVAXUSDT     score=0.4242 close->done=941ms (p50=933ms p95=1027ms)
+07:42:40 BCHUSDT      score=0.4204 close->done=947ms (p50=933ms p95=1027ms)
+07:42:40 ARBUSDT      score=0.5043 close->done=953ms (p50=934ms p95=1026ms)
+07:42:40 DOGEUSDT     score=0.6045 close->done=963ms (p50=934ms p95=1026ms)  *** ALERT ***
+07:42:40 FILUSDT      score=0.4222 close->done=968ms (p50=935ms p95=1026ms)
+07:42:40 APTUSDT      score=0.4139 close->done=973ms (p50=935ms p95=1026ms)
+07:42:40 ADAUSDT      score=0.4695 close->done=978ms (p50=935ms p95=1026ms)
+07:42:40 ATOMUSDT     score=0.4137 close->done=983ms (p50=935ms p95=1026ms)
+07:42:45 BTCUSDT      score=0.5944 close->done=12ms (p50=935ms p95=1026ms)  *** ALERT ***
+07:42:45 BNBUSDT      score=0.5291 close->done=195ms (p50=935ms p95=1026ms)
+07:42:45 ETHUSDT      score=0.6281 close->done=878ms (p50=935ms p95=1026ms)  *** ALERT ***
+07:42:45 NEARUSDT     score=0.4871 close->done=914ms (p50=934ms p95=1026ms)
+07:42:45 SOLUSDT      score=0.5211 close->done=921ms (p50=934ms p95=1026ms)
+07:42:45 XRPUSDT      score=0.6455 close->done=929ms (p50=933ms p95=1025ms)  *** ALERT ***
+07:42:45 LINKUSDT     score=0.4877 close->done=935ms (p50=934ms p95=1025ms)
+07:42:45 BCHUSDT      score=0.4281 close->done=941ms (p50=934ms p95=1025ms)
+07:42:45 ARBUSDT      score=0.5278 close->done=947ms (p50=934ms p95=1025ms)
+07:42:45 DOGEUSDT     score=0.6134 close->done=955ms (p50=935ms p95=1025ms)  *** ALERT ***
+07:42:45 TRXUSDT      score=0.4964 close->done=961ms (p50=935ms p95=1025ms)
+07:42:45 DOTUSDT      score=0.4061 close->done=967ms (p50=935ms p95=1025ms)
+07:42:45 ADAUSDT      score=0.4798 close->done=972ms (p50=935ms p95=1025ms)
+07:42:50 ETHUSDT      score=0.6268 close->done=537ms (p50=935ms p95=1025ms)  *** ALERT ***
+07:42:50 NEARUSDT     score=0.4745 close->done=915ms (p50=935ms p95=1025ms)
+07:42:50 BTCUSDT      score=0.5979 close->done=923ms (p50=935ms p95=1025ms)  *** ALERT ***
+07:42:50 SOLUSDT      score=0.4934 close->done=930ms (p50=934ms p95=1025ms)
+07:42:50 BNBUSDT      score=0.5052 close->done=936ms (p50=935ms p95=1025ms)
+07:42:50 LTCUSDT      score=0.4053 close->done=942ms (p50=935ms p95=1025ms)
+07:42:50 XRPUSDT      score=0.6252 close->done=950ms (p50=935ms p95=1025ms)  *** ALERT ***
+07:42:50 LINKUSDT     score=0.4524 close->done=956ms (p50=935ms p95=1025ms)
+07:42:50 BCHUSDT      score=0.4226 close->done=961ms (p50=935ms p95=1025ms)
+07:42:50 ARBUSDT      score=0.4736 close->done=966ms (p50=935ms p95=1025ms)
+07:42:50 TRXUSDT      score=0.4962 close->done=971ms (p50=935ms p95=1025ms)
+07:42:50 DOTUSDT      score=0.4061 close->done=976ms (p50=935ms p95=1025ms)
+07:42:55 ETHUSDT      score=0.6314 close->done=14ms (p50=935ms p95=1025ms)  *** ALERT ***
+07:42:55 BTCUSDT      score=0.6137 close->done=180ms (p50=935ms p95=1025ms)  *** ALERT ***
+07:42:55 BNBUSDT      score=0.5019 close->done=594ms (p50=935ms p95=1025ms)
+07:42:55 XRPUSDT      score=0.6764 close->done=729ms (p50=935ms p95=1025ms)  *** ALERT ***
+07:42:55 LINKUSDT     score=0.4368 close->done=748ms (p50=935ms p95=1025ms)
+07:42:55 SOLUSDT      score=0.5176 close->done=755ms (p50=935ms p95=1025ms)
+07:42:55 AVAXUSDT     score=0.4258 close->done=761ms (p50=935ms p95=1025ms)
+07:42:55 NEARUSDT     score=0.4879 close->done=908ms (p50=934ms p95=1025ms)
+07:42:55 BCHUSDT      score=0.4207 close->done=915ms (p50=934ms p95=1025ms)
+07:42:55 DOGEUSDT     score=0.6174 close->done=924ms (p50=934ms p95=1025ms)  *** ALERT ***
+07:42:55 FILUSDT      score=0.4246 close->done=932ms (p50=933ms p95=1025ms)
+07:43:00 ETHUSDT      score=0.6315 close->done=419ms (p50=933ms p95=1024ms)  *** ALERT ***
+07:43:00 BTCUSDT      score=0.6027 close->done=634ms (p50=933ms p95=1024ms)  *** ALERT ***
+07:43:00 NEARUSDT     score=0.4926 close->done=722ms (p50=933ms p95=1024ms)
+07:43:00 SOLUSDT      score=0.5185 close->done=925ms (p50=933ms p95=1024ms)
+07:43:00 BNBUSDT      score=0.5097 close->done=931ms (p50=933ms p95=1024ms)
+07:43:00 LTCUSDT      score=0.4084 close->done=937ms (p50=933ms p95=1024ms)
+07:43:00 XRPUSDT      score=0.6879 close->done=944ms (p50=933ms p95=1024ms)  *** ALERT ***
+07:43:00 LINKUSDT     score=0.4421 close->done=950ms (p50=933ms p95=1024ms)
+07:43:00 AVAXUSDT     score=0.4255 close->done=956ms (p50=933ms p95=1024ms)
+07:43:00 BCHUSDT      score=0.4198 close->done=962ms (p50=933ms p95=1024ms)
+07:43:00 ARBUSDT      score=0.5037 close->done=967ms (p50=934ms p95=1024ms)
+07:43:00 DOGEUSDT     score=0.5955 close->done=973ms (p50=934ms p95=1024ms)  *** ALERT ***
+07:43:00 TRXUSDT      score=0.4703 close->done=979ms (p50=934ms p95=1024ms)
+07:43:00 FILUSDT      score=0.4281 close->done=984ms (p50=935ms p95=1024ms)
+07:43:00 APTUSDT      score=0.4141 close->done=989ms (p50=935ms p95=1024ms)
+07:43:00 ADAUSDT      score=0.4756 close->done=993ms (p50=935ms p95=1024ms)
+07:43:00 ATOMUSDT     score=0.4118 close->done=998ms (p50=935ms p95=1024ms)
+07:43:05 ETHUSDT      score=0.6376 close->done=14ms (p50=935ms p95=1024ms)  *** ALERT ***
+07:43:05 BTCUSDT      score=0.6035 close->done=310ms (p50=935ms p95=1024ms)  *** ALERT ***
+07:43:05 BNBUSDT      score=0.5169 close->done=643ms (p50=935ms p95=1024ms)
+07:43:05 SOLUSDT      score=0.5114 close->done=861ms (p50=934ms p95=1024ms)
+07:43:05 NEARUSDT     score=0.4771 close->done=911ms (p50=934ms p95=1024ms)
+07:43:05 XRPUSDT      score=0.6329 close->done=919ms (p50=934ms p95=1024ms)  *** ALERT ***
+07:43:05 BCHUSDT      score=0.4195 close->done=925ms (p50=933ms p95=1024ms)
+07:43:05 ARBUSDT      score=0.5067 close->done=931ms (p50=933ms p95=1024ms)
+07:43:05 DOGEUSDT     score=0.6032 close->done=939ms (p50=933ms p95=1024ms)  *** ALERT ***
+07:43:05 TRXUSDT      score=0.4361 close->done=945ms (p50=934ms p95=1023ms)
+07:43:05 ADAUSDT      score=0.4690 close->done=951ms (p50=934ms p95=1023ms)
+07:43:05 ATOMUSDT     score=0.4156 close->done=956ms (p50=934ms p95=1023ms)
+07:43:10 BTCUSDT      score=0.5908 close->done=171ms (p50=934ms p95=1023ms)  *** ALERT ***
+07:43:10 ETHUSDT      score=0.6147 close->done=510ms (p50=934ms p95=1023ms)  *** ALERT ***
+07:43:10 XRPUSDT      score=0.6129 close->done=881ms (p50=933ms p95=1023ms)  *** ALERT ***
+07:43:10 BNBUSDT      score=0.5041 close->done=889ms (p50=933ms p95=1023ms)
+07:43:10 NEARUSDT     score=0.4706 close->done=902ms (p50=933ms p95=1023ms)
+07:43:10 SOLUSDT      score=0.4902 close->done=907ms (p50=933ms p95=1023ms)
+07:43:10 LTCUSDT      score=0.3955 close->done=912ms (p50=933ms p95=1023ms)
+07:43:10 LINKUSDT     score=0.4476 close->done=918ms (p50=933ms p95=1023ms)
+07:43:10 AVAXUSDT     score=0.4134 close->done=925ms (p50=933ms p95=1023ms)
+07:43:10 BCHUSDT      score=0.4196 close->done=931ms (p50=933ms p95=1023ms)
+07:43:10 ARBUSDT      score=0.4743 close->done=936ms (p50=933ms p95=1023ms)
+07:43:10 DOGEUSDT     score=0.5488 close->done=944ms (p50=933ms p95=1023ms)  *** ALERT ***
+07:43:10 TRXUSDT      score=0.4498 close->done=949ms (p50=933ms p95=1022ms)
+07:43:10 DOTUSDT      score=0.4154 close->done=954ms (p50=933ms p95=1022ms)
+07:43:10 FILUSDT      score=0.4193 close->done=959ms (p50=933ms p95=1022ms)
+07:43:15 BNBUSDT      score=0.5366 close->done=119ms (p50=933ms p95=1022ms)  *** ALERT ***
+07:43:15 BTCUSDT      score=0.5922 close->done=503ms (p50=933ms p95=1022ms)  *** ALERT ***
+07:43:15 NEARUSDT     score=0.4589 close->done=910ms (p50=933ms p95=1022ms)
+07:43:15 SOLUSDT      score=0.5064 close->done=917ms (p50=933ms p95=1022ms)
+07:43:15 LTCUSDT      score=0.4029 close->done=923ms (p50=933ms p95=1022ms)
+07:43:15 ETHUSDT      score=0.6331 close->done=931ms (p50=933ms p95=1022ms)  *** ALERT ***
+07:43:15 XRPUSDT      score=0.6532 close->done=938ms (p50=933ms p95=1022ms)  *** ALERT ***
+07:43:15 LINKUSDT     score=0.4477 close->done=943ms (p50=933ms p95=1022ms)
+07:43:15 ARBUSDT      score=0.4754 close->done=948ms (p50=933ms p95=1022ms)
+07:43:15 OPUSDT       score=0.4119 close->done=953ms (p50=933ms p95=1022ms)
+07:43:15 DOGEUSDT     score=0.5254 close->done=957ms (p50=933ms p95=1022ms)
+07:43:15 ADAUSDT      score=0.4451 close->done=962ms (p50=933ms p95=1022ms)
+07:43:15 ETCUSDT      score=0.4115 close->done=968ms (p50=933ms p95=1022ms)
+07:43:20 ETHUSDT      score=0.6351 close->done=150ms (p50=933ms p95=1022ms)  *** ALERT ***
+07:43:20 BTCUSDT      score=0.6026 close->done=229ms (p50=933ms p95=1022ms)  *** ALERT ***
+07:43:20 BNBUSDT      score=0.5136 close->done=620ms (p50=933ms p95=1022ms)
+07:43:20 NEARUSDT     score=0.5027 close->done=891ms (p50=933ms p95=1022ms)
+07:43:20 SOLUSDT      score=0.5084 close->done=898ms (p50=933ms p95=1022ms)
+07:43:20 LTCUSDT      score=0.4011 close->done=904ms (p50=933ms p95=1022ms)
+07:43:20 XRPUSDT      score=0.6575 close->done=912ms (p50=933ms p95=1021ms)  *** ALERT ***
+07:43:20 LINKUSDT     score=0.4587 close->done=918ms (p50=933ms p95=1021ms)
+07:43:20 BCHUSDT      score=0.4164 close->done=924ms (p50=932ms p95=1021ms)
+07:43:20 ARBUSDT      score=0.4422 close->done=930ms (p50=932ms p95=1021ms)
+07:43:20 DOGEUSDT     score=0.5432 close->done=937ms (p50=932ms p95=1021ms)  *** ALERT ***
+07:43:20 TRXUSDT      score=0.4247 close->done=943ms (p50=933ms p95=1021ms)
+07:43:20 FILUSDT      score=0.4151 close->done=949ms (p50=933ms p95=1021ms)
+07:43:20 ADAUSDT      score=0.4271 close->done=954ms (p50=933ms p95=1021ms)
+07:43:25 ETHUSDT      score=0.6442 close->done=13ms (p50=933ms p95=1021ms)  *** ALERT ***
+07:43:25 BTCUSDT      score=0.6207 close->done=24ms (p50=933ms p95=1021ms)  *** ALERT ***
+07:43:25 XRPUSDT      score=0.6633 close->done=178ms (p50=932ms p95=1021ms)  *** ALERT ***
+07:43:25 BNBUSDT      score=0.5394 close->done=188ms (p50=932ms p95=1021ms)  *** ALERT ***
+07:43:25 LINKUSDT     score=0.4614 close->done=789ms (p50=932ms p95=1021ms)
+07:43:25 NEARUSDT     score=0.4907 close->done=891ms (p50=932ms p95=1021ms)
+07:43:25 SOLUSDT      score=0.5096 close->done=897ms (p50=931ms p95=1021ms)
+07:43:25 LTCUSDT      score=0.4055 close->done=903ms (p50=931ms p95=1021ms)
+07:43:25 AVAXUSDT     score=0.4244 close->done=909ms (p50=931ms p95=1021ms)
+07:43:25 BCHUSDT      score=0.4173 close->done=914ms (p50=931ms p95=1020ms)
+07:43:25 ARBUSDT      score=0.4827 close->done=921ms (p50=931ms p95=1020ms)
+07:43:25 FILUSDT      score=0.4149 close->done=928ms (p50=931ms p95=1020ms)
+07:43:25 ADAUSDT      score=0.4910 close->done=933ms (p50=931ms p95=1020ms)
+07:43:30 BNBUSDT      score=0.5192 close->done=69ms (p50=931ms p95=1020ms)
+07:43:30 XRPUSDT      score=0.6480 close->done=202ms (p50=931ms p95=1020ms)  *** ALERT ***
+07:43:30 NEARUSDT     score=0.5148 close->done=907ms (p50=931ms p95=1020ms)
+07:43:30 BTCUSDT      score=0.6142 close->done=917ms (p50=931ms p95=1020ms)  *** ALERT ***
+07:43:30 SOLUSDT      score=0.4841 close->done=924ms (p50=931ms p95=1020ms)
+07:43:30 LTCUSDT      score=0.3948 close->done=931ms (p50=931ms p95=1020ms)
+07:43:30 ETHUSDT      score=0.6369 close->done=938ms (p50=931ms p95=1020ms)  *** ALERT ***
+07:43:30 LINKUSDT     score=0.4391 close->done=943ms (p50=931ms p95=1020ms)
+07:43:30 AVAXUSDT     score=0.4201 close->done=948ms (p50=931ms p95=1020ms)
+07:43:30 BCHUSDT      score=0.4222 close->done=953ms (p50=931ms p95=1020ms)
+07:43:30 ARBUSDT      score=0.4887 close->done=958ms (p50=931ms p95=1020ms)
+07:43:30 OPUSDT       score=0.4158 close->done=963ms (p50=931ms p95=1020ms)
+07:43:30 DOGEUSDT     score=0.5334 close->done=968ms (p50=931ms p95=1020ms)
+07:43:30 TRXUSDT      score=0.4535 close->done=973ms (p50=931ms p95=1020ms)
+07:43:30 DOTUSDT      score=0.4020 close->done=978ms (p50=931ms p95=1020ms)
+07:43:30 FILUSDT      score=0.4111 close->done=983ms (p50=931ms p95=1020ms)
+07:43:30 APTUSDT      score=0.4063 close->done=988ms (p50=932ms p95=1020ms)
+07:43:30 ADAUSDT      score=0.4797 close->done=994ms (p50=932ms p95=1020ms)
+07:43:35 ETHUSDT      score=0.6340 close->done=48ms (p50=932ms p95=1020ms)  *** ALERT ***
+07:43:35 BNBUSDT      score=0.5503 close->done=452ms (p50=931ms p95=1020ms)  *** ALERT ***
+07:43:35 BTCUSDT      score=0.6105 close->done=497ms (p50=931ms p95=1020ms)  *** ALERT ***
+07:43:35 SOLUSDT      score=0.4942 close->done=711ms (p50=931ms p95=1020ms)
+07:43:35 NEARUSDT     score=0.5364 close->done=961ms (p50=931ms p95=1020ms)  *** ALERT ***
+07:43:35 LTCUSDT      score=0.4060 close->done=969ms (p50=931ms p95=1020ms)
+07:43:35 XRPUSDT      score=0.6661 close->done=977ms (p50=932ms p95=1020ms)  *** ALERT ***
+07:43:35 LINKUSDT     score=0.4534 close->done=983ms (p50=932ms p95=1020ms)
+07:43:35 AVAXUSDT     score=0.4163 close->done=989ms (p50=932ms p95=1020ms)
+07:43:35 ARBUSDT      score=0.4856 close->done=995ms (p50=932ms p95=1020ms)
+07:43:35 DOGEUSDT     score=0.5929 close->done=1002ms (p50=933ms p95=1020ms)  *** ALERT ***
+07:43:35 TRXUSDT      score=0.4593 close->done=1007ms (p50=933ms p95=1020ms)
+07:43:35 DOTUSDT      score=0.4159 close->done=1012ms (p50=933ms p95=1020ms)

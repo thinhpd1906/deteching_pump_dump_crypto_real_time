@@ -1,0 +1,9 @@
+/Users/elvisle/pnd-thesis/src/pipeline/python_bars.py:150: DeprecationWarning: value_deserializer does not implement kafka.serializer.Deserializer
+  consumer = KafkaConsumer(
+/Users/elvisle/pnd-thesis/src/pipeline/python_bars.py:191: DeprecationWarning: value_serializer does not implement kafka.serializer.Serializer
+  main()
+Python bars aggregator (adaptive cleaning) running on raw-trades -> bars
+  500 bars emitted, last: DOTUSDT 2026-11-06T07:33:00+00:00  removed_ticks=0 late=0
+  1000 bars emitted, last: ADAUSDT 2026-11-06T07:35:40+00:00  removed_ticks=1 late=0
+  1500 bars emitted, last: AVAXUSDT 2026-11-06T07:40:10+00:00  removed_ticks=1 late=0
+  2000 bars emitted, last: ARBUSDT 2026-11-06T07:42:40+00:00  removed_ticks=3 late=0
