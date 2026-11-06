@@ -24,6 +24,15 @@ Resumable (for time-limited Kaggle sessions):
     deadline, save state and exit with code 75 (EXIT_INCOMPLETE)
   * a run whose {tag}_test.json already exists is skipped
 
+Research protocol (CLAUDE.md s19, task A2):
+  * --search           val-only: test.npz is never opened; the result goes to
+                       artifacts/<mode>/search/<tag>_val.json
+  * --set key=value    config override (repeatable), locked keys rejected;
+                       a non-default config gets tag suffix _o<hash8>
+  * normal mode appends to artifacts/test_ledger.jsonl right before test is
+    loaded and refuses a repeated (mode, tag, config hash) unless
+    --ledger-override "<reason>"
+
 Usage:
     python -m src.training.finetune --clean adaptive --arch cnnbilstm
     python -m src.training.finetune --clean adaptive --arch at
@@ -44,9 +53,14 @@ import yaml
 
 from src.models.anomaly_transformer import ATClassifier, AnomalyTransformer
 from src.models.deep_baselines import CNNBiLSTM
-from src.training.common import (EarlyStop, full_eval, load_split, save_result,
-                                 get_device, make_generator,
+from src.training.common import (EarlyStop, full_eval, get_device,
+                                 load_split, make_generator, save_result,
+                                 save_search_result, search_result_path,
                                  subsample_labels, tune_threshold)
+from src.training.protocol import (add_protocol_args, apply_overrides,
+                                   atomic_torch_save, config_hash, git_sha,
+                                   ledger_append, ledger_check, override_suffix,
+                                   parse_set, semantic_overrides)
 
 EXIT_INCOMPLETE = 75
 
@@ -100,7 +114,7 @@ def predict_scores(model, X, dev, bs=2048, amp=False) -> np.ndarray:
     return np.concatenate(outs)
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="config/config.yaml")
     ap.add_argument("--clean", default="adaptive")
@@ -113,9 +127,12 @@ def main() -> None:
     ap.add_argument("--tag", default=None)
     ap.add_argument("--deadline", type=float, default=None,
                     help="unix time; save state and exit 75 before it")
-    args = ap.parse_args()
+    add_protocol_args(ap)
+    args = ap.parse_args(argv)
 
-    cfg = yaml.safe_load(open(args.config))
+    overrides = parse_set(args.set)
+    cfg = apply_overrides(yaml.safe_load(open(args.config)), overrides)
+    chash = config_hash(cfg)
     M, TR = cfg["model"], cfg["train"]
     seed = args.seed if args.seed is not None else TR["seed"]
     torch.manual_seed(seed)
@@ -127,11 +144,20 @@ def main() -> None:
     os.makedirs(art, exist_ok=True)
     labels_csv = cfg["paths"]["labels_csv"]
 
-    tag = args.tag or run_tag(args.arch, args.pretrained, args.label_frac,
-                              args.seed)
-    if os.path.exists(os.path.join(art, f"{tag}_test.json")):
-        print(f"[{tag}] result already exists -- skipping")
+    tag = args.tag or (run_tag(args.arch, args.pretrained, args.label_frac,
+                               args.seed) + override_suffix(overrides))
+    if args.search:
+        out_json = search_result_path(art_root, args.clean, tag)
+        ck_dir = os.path.join(art, "search")
+    else:
+        out_json = os.path.join(art, f"{tag}_test.json")
+        ck_dir = art
+    if os.path.exists(out_json):
+        print(f"[{tag}] result already exists -- skipping ({out_json})")
         return
+    if not args.search:   # fail fast, before any training
+        ledger_check(cfg, args.clean, tag, chash, args.ledger_override)
+    os.makedirs(ck_dir, exist_ok=True)
 
     Xtr, ytr, etr, ptr = load_split(dd, "train")
     Xv, yv, ev, pv = load_split(dd, "val")
@@ -168,8 +194,8 @@ def main() -> None:
 
     epochs = args.epochs or TR["finetune_epochs"]
     stopper = EarlyStop(TR["patience"])
-    best_path = os.path.join(art, f"{tag}.pt")
-    last_path = os.path.join(art, f"{tag}_last.pt")
+    best_path = os.path.join(ck_dir, f"{tag}.pt")
+    last_path = os.path.join(ck_dir, f"{tag}_last.pt")
     start_ep = 1
 
     if os.path.exists(last_path):
@@ -183,7 +209,10 @@ def main() -> None:
         print(f"  resumed from {last_path} (epoch {st['epoch']} done, "
               f"best valF1={stopper.best:.4f})")
 
-    print(f"=== FINETUNE [{tag}] on '{args.clean}' ===")
+    print(f"=== FINETUNE [{tag}] on '{args.clean}'"
+          f"{'  (SEARCH: val only)' if args.search else ''} ===")
+    if overrides:
+        print(f"  overrides: {semantic_overrides(overrides)}  config={chash}")
     print(f"  train N={len(ytr):,} (pos={int(ytr.sum()):,}, "
           f"label_frac={args.label_frac})")
     print(f"  pos_weight={pw:.1f}  device={dev}  amp={amp}  seed={seed}  "
@@ -222,13 +251,15 @@ def main() -> None:
 
         flag = ""
         if stopper.step(f1v):
-            torch.save({"state_dict": model.state_dict(), "thr": thr,
-                        "arch": args.arch, "win": win, "d_in": d_in,
-                        "model_cfg": M}, best_path)
+            atomic_torch_save({"state_dict": model.state_dict(), "thr": thr,
+                               "arch": args.arch, "win": win, "d_in": d_in,
+                               "model_cfg": M, "config_hash": chash},
+                              best_path)
             flag = "  <- saved"
-        torch.save({"model": model.state_dict(), "opt": opt.state_dict(),
-                    "scaler": scaler.state_dict(), "best": stopper.best,
-                    "count": stopper.count, "epoch": ep}, last_path)
+        atomic_torch_save({"model": model.state_dict(),
+                           "opt": opt.state_dict(),
+                           "scaler": scaler.state_dict(), "best": stopper.best,
+                           "count": stopper.count, "epoch": ep}, last_path)
         ep_time = time.time() - t0
         print(f"  ep {ep:02d}  loss={tot / len(ytr):.4f}  "
               f"valF1={f1v:.4f}  thr={thr:.4f}  ({ep_time:.0f}s){flag}",
@@ -238,16 +269,37 @@ def main() -> None:
     if stopper.should_stop:
         print(f"  early stop (no val improvement for {TR['patience']} epochs)")
 
-    # ---- final evaluation: test set touched EXACTLY ONCE, with saved threshold
     del Xg, yg
-    Xte, yte, ete, pte = load_split(dd, "test")
     ck = torch.load(best_path, map_location=dev)
     model.load_state_dict(ck["state_dict"])
+    meta = {"val_f1": round(float(stopper.best), 4),
+            "label_frac": args.label_frac, "seed": seed,
+            "arch": args.arch, "pretrained": bool(args.pretrained),
+            "overrides": semantic_overrides(overrides),
+            "config_hash": chash, "git_sha": git_sha(),
+            "epochs_run": ep - 1}
+
+    if args.search:
+        # ---- SEARCH: validation only. test.npz is never opened here.
+        s_val = predict_scores(model, Xv, dev, amp=amp)
+        res = full_eval(yv, s_val, ck["thr"], ev, pv, labels_csv, cfg)
+        res.update(meta)
+        path = save_search_result(art_root, args.clean, tag, res)
+        os.remove(last_path)
+        print(f"\n  VAL  F1={res['f1']:.4f}  P={res['precision']:.4f}  "
+              f"R={res['recall']:.4f}  PR={res['pr_auc']:.4f}  "
+              f"evR={res['event_recall']:.4f}")
+        print(f"  -> {path}")
+        return
+
+    # ---- final evaluation: test set touched EXACTLY ONCE, with saved threshold
+    ledger_append(cfg, clean=args.clean, tag=tag, chash=chash,
+                  overrides=overrides, script="finetune",
+                  checkpoint=best_path, override_reason=args.ledger_override)
+    Xte, yte, ete, pte = load_split(dd, "test")
     s_te = predict_scores(model, Xte, dev, amp=amp)
     res = full_eval(yte, s_te, ck["thr"], ete, pte, labels_csv, cfg)
-    res["val_f1"] = round(float(stopper.best), 4)
-    res["label_frac"] = args.label_frac
-    res["seed"] = seed
+    res.update(meta)
     save_result(art_root, args.clean, tag, res)
     os.remove(last_path)
 
@@ -260,7 +312,6 @@ def main() -> None:
     print(f"  F1 95% CI (bootstrap over symbols): "
           f"[{res['f1_lo']:.4f}, {res['f1_hi']:.4f}]")
     print(f"  -> {art}/{tag}_test.json")
-
 
 if __name__ == "__main__":
     main()

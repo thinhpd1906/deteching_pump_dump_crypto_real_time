@@ -26,7 +26,9 @@ from sklearn.preprocessing import StandardScaler
 
 from src.data.features import FEATURES
 from src.training.common import (full_eval, load_split, save_result,
-                                 tune_threshold)
+                                 save_search_result, tune_threshold)
+from src.training.protocol import (add_protocol_args, config_hash, git_sha,
+                                   ledger_append, ledger_check)
 
 I_RET = FEATURES.index("ret")
 I_ZRET = FEATURES.index("z_ret")
@@ -108,26 +110,57 @@ def window_stats(X: np.ndarray) -> np.ndarray:
 
 
 # ------------------------------------------------------------------- main
-def main() -> None:
+BASELINE_TAGS = ["b1_rule", "b2_rushorder", "b3_microstructure",
+                 "b4_randomforest", "b5_logreg", "b6_xgboost"]
+
+
+def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="config/config.yaml")
     ap.add_argument("--clean", default="adaptive")
-    args = ap.parse_args()
+    add_protocol_args(ap, with_set=False)
+    args = ap.parse_args(argv)
 
     cfg = yaml.safe_load(open(args.config))
     dd = os.path.join(cfg["paths"]["processed_dir"], args.clean)
     art = cfg["paths"]["artifacts_dir"]
     labels_csv = cfg["paths"]["labels_csv"]
+    chash = config_hash(cfg)
 
     Xtr, ytr, etr, ptr = load_split(dd, "train", scale=False)
     Xv, yv, ev, pv = load_split(dd, "val", scale=False)
-    Xte, yte, ete, pte = load_split(dd, "test", scale=False)
-    print(f"[{args.clean}] train={len(ytr):,} val={len(yv):,} test={len(yte):,}"
-          f"  pos_rate_train={ytr.mean():.3%}")
+    if args.search:
+        # val-only: test.npz is never opened
+        Xte = yte = ete = pte = None
+        print(f"[{args.clean}] SEARCH (val only) train={len(ytr):,} "
+              f"val={len(yv):,}  pos_rate_train={ytr.mean():.3%}")
+    else:
+        for t in BASELINE_TAGS:          # refuse before touching anything
+            ledger_check(cfg, args.clean, t, chash, args.ledger_override)
+        for t in BASELINE_TAGS:
+            ledger_append(cfg, clean=args.clean, tag=t, chash=chash,
+                          overrides={}, script="baselines",
+                          override_reason=args.ledger_override)
+        Xte, yte, ete, pte = load_split(dd, "test", scale=False)
+        print(f"[{args.clean}] train={len(ytr):,} val={len(yv):,} "
+              f"test={len(yte):,}  pos_rate_train={ytr.mean():.3%}")
+
+    def scores_te(fn):
+        """Apply a scorer to test, or skip it entirely in search mode."""
+        return None if args.search else fn(Xte)
 
     def report(tag, s_val, s_te):
         thr, f1v = tune_threshold(yv, s_val)
+        if args.search:
+            res = full_eval(yv, s_val, thr, ev, pv, labels_csv, cfg)
+            res["config_hash"] = chash
+            save_search_result(art, args.clean, tag, res)
+            print(f"  [{tag:14s}] valF1={f1v:.4f} (search, val only) "
+                  f"AUC={res['roc_auc']:.4f} evR={res['event_recall']:.4f}")
+            return res
         res = full_eval(yte, s_te, thr, ete, pte, labels_csv, cfg)
+        res.update({"val_f1": round(float(f1v), 4), "config_hash": chash,
+                    "git_sha": git_sha()})
         save_result(art, args.clean, tag, res)
         print(f"  [{tag:14s}] valF1={f1v:.4f} | testF1={res['f1']:.4f} "
               f"P={res['precision']:.4f} R={res['recall']:.4f} "
@@ -138,33 +171,36 @@ def main() -> None:
 
     a, b = fit_rule(Xv, yv)
     print(f"  rule grid -> a={a:.2f}, b={b:.2f}")
-    report("b1_rule", rule_score(Xv, a, b), rule_score(Xte, a, b))
+    report("b1_rule", rule_score(Xv, a, b),
+           scores_te(lambda X: rule_score(X, a, b)))
 
-    report("b2_rushorder", rush_order_score(Xv), rush_order_score(Xte))
+    report("b2_rushorder", rush_order_score(Xv), scores_te(rush_order_score))
 
-    Mtr, Mv, Mte = (microstructure_features(A) for A in (Xtr, Xv, Xte))
+    Mtr, Mv = microstructure_features(Xtr), microstructure_features(Xv)
     sc = StandardScaler().fit(Mtr)
     lr_micro = LogisticRegression(max_iter=2000, class_weight="balanced")
     lr_micro.fit(sc.transform(Mtr), ytr)
     report("b3_microstructure",
            lr_micro.predict_proba(sc.transform(Mv))[:, 1],
-           lr_micro.predict_proba(sc.transform(Mte))[:, 1])
+           scores_te(lambda X: lr_micro.predict_proba(
+               sc.transform(microstructure_features(X)))[:, 1]))
 
     print(f"\n--- Family 2: classical ML (50-dim window stats) ---")
-    Str, Sv, Ste = (window_stats(A) for A in (Xtr, Xv, Xte))
+    Str, Sv = window_stats(Xtr), window_stats(Xv)
 
     rf = RandomForestClassifier(n_estimators=300, class_weight="balanced",
                                 n_jobs=-1, random_state=42)
     rf.fit(Str, ytr)
-    res_rf = report("b4_randomforest",
-                    rf.predict_proba(Sv)[:, 1], rf.predict_proba(Ste)[:, 1])
+    res_rf = report("b4_randomforest", rf.predict_proba(Sv)[:, 1],
+                    scores_te(lambda X: rf.predict_proba(window_stats(X))[:, 1]))
 
     sc2 = StandardScaler().fit(Str)
     lr = LogisticRegression(max_iter=3000, class_weight="balanced")
     lr.fit(sc2.transform(Str), ytr)
     report("b5_logreg",
            lr.predict_proba(sc2.transform(Sv))[:, 1],
-           lr.predict_proba(sc2.transform(Ste))[:, 1])
+           scores_te(lambda X: lr.predict_proba(
+               sc2.transform(window_stats(X)))[:, 1]))
 
     try:
         from xgboost import XGBClassifier
@@ -174,8 +210,8 @@ def main() -> None:
                             scale_pos_weight=spw, eval_metric="logloss",
                             n_jobs=-1, random_state=42)
         xgb.fit(Str, ytr)
-        report("b6_xgboost",
-               xgb.predict_proba(Sv)[:, 1], xgb.predict_proba(Ste)[:, 1])
+        report("b6_xgboost", xgb.predict_proba(Sv)[:, 1],
+               scores_te(lambda X: xgb.predict_proba(window_stats(X))[:, 1]))
     except ImportError:
         print("  [b6_xgboost    ] skipped (pip install xgboost)")
 

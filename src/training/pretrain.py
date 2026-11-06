@@ -31,6 +31,10 @@ from torch.utils.data import DataLoader, TensorDataset
 from src.models.anomaly_transformer import (AnomalyTransformer, anomaly_score,
                                             minimax_losses)
 from src.training.common import get_device, load_pretrain_pool, load_split
+from src.training.protocol import (apply_overrides, atomic_torch_save,
+                                   atomic_write_json, config_hash,
+                                   override_suffix, parse_set,
+                                   semantic_overrides)
 
 
 def mask_input(x: torch.Tensor, ratio: float) -> torch.Tensor:
@@ -51,7 +55,7 @@ def _batched_scores(model, X, dev, bs=256):
     return np.concatenate(out)
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="config/config.yaml")
     ap.add_argument("--clean", default="adaptive")
@@ -63,9 +67,15 @@ def main() -> None:
     ap.add_argument("--start-epoch", type=int, default=None,
                     help="epoch number to resume from (1-indexed). Defaults "
                          "to checkpoint's saved epoch + 1 when --resume is set")
-    args = ap.parse_args()
+    ap.add_argument("--set", action="append", default=[], metavar="KEY=VALUE",
+                    help="config override (repeatable); locked keys rejected. "
+                         "A non-default config writes to "
+                         "artifacts/<mode>/pretrain_cache/<hash>.pt and never "
+                         "touches at_pretrained.pt")
+    args = ap.parse_args(argv)
 
-    cfg = yaml.safe_load(open(args.config))
+    overrides = parse_set(args.set)
+    cfg = apply_overrides(yaml.safe_load(open(args.config)), overrides)
     M, TR = cfg["model"], cfg["train"]
     seed = args.seed if args.seed is not None else TR["seed"]
     torch.manual_seed(seed)
@@ -88,7 +98,15 @@ def main() -> None:
     opt = torch.optim.AdamW(model.parameters(), lr=TR["lr"])
     epochs = args.epochs or TR["pretrain_epochs"]
 
-    path = os.path.join(art, "at_pretrained.pt")
+    suffix = override_suffix(overrides)
+    if suffix:
+        cache = os.path.join(art, "pretrain_cache")
+        path = os.path.join(cache, f"at_pretrained{suffix}.pt")
+        atomic_write_json({"overrides": semantic_overrides(overrides),
+                           "config_hash": config_hash(cfg)},
+                          os.path.join(cache, f"at_pretrained{suffix}.json"))
+    else:
+        path = os.path.join(art, "at_pretrained.pt")
     start_epoch = args.start_epoch or 1
     if args.resume:
         if not os.path.exists(path):
@@ -134,10 +152,10 @@ def main() -> None:
         print(f"  epoch {ep:02d}/{epochs}  recon={rec_sum / n:.6f}  "
               f"({time.time() - t0:.1f}s)")
 
-        torch.save({"state_dict": model.state_dict(),
-                    "optimizer_state_dict": opt.state_dict(),
-                    "epoch": ep, "win": win, "d_in": d_in,
-                    "model_cfg": M}, path)
+        atomic_torch_save({"state_dict": model.state_dict(),
+                           "optimizer_state_dict": opt.state_dict(),
+                           "epoch": ep, "win": win, "d_in": d_in,
+                           "model_cfg": M}, path)
 
     print(f"\n  saved encoder -> {path}")
 

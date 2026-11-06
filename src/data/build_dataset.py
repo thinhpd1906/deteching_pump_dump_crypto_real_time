@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import argparse
 import glob
-import json
 import os
 
 import numpy as np
@@ -29,6 +28,7 @@ import yaml
 from tqdm import tqdm
 
 from src.cleaning.filters import clean_ticks, cleaning_stats
+from src.training.protocol import atomic_write_json
 from src.data.features import (FEATURES, bars_to_features, label_windows,
                                make_windows, trades_to_bars)
 
@@ -290,9 +290,9 @@ def build_mode(cfg: dict, mode: str) -> None:
     mtr = tag == "train"
     mean = X[mtr].reshape(-1, X.shape[-1]).mean(0)
     std = X[mtr].reshape(-1, X.shape[-1]).std(0) + 1e-8
-    json.dump({"features": FEATURES, "mean": mean.tolist(),
-               "std": std.tolist()},
-              open(os.path.join(out_dir, "scaler.json"), "w"), indent=2)
+    atomic_write_json({"features": FEATURES, "mean": mean.tolist(),
+                       "std": std.tolist()},
+                      os.path.join(out_dir, "scaler.json"))
 
     # unlabeled pool for self-supervised pretraining = train negatives
     mpool = mtr & (y == 0)
@@ -301,8 +301,7 @@ def build_mode(cfg: dict, mode: str) -> None:
     print(f"[{mode}] pretrain pool: {int(mpool.sum()):,} unlabeled windows")
 
     stats["removed_pct"] = round(rm_pct, 4)
-    json.dump(stats, open(os.path.join(out_dir, "cleaning_stats.json"), "w"),
-              indent=2)
+    atomic_write_json(stats, os.path.join(out_dir, "cleaning_stats.json"))
     print(f"[{mode}] -> {out_dir}")
 
 

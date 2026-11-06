@@ -24,6 +24,8 @@ from src.models.anomaly_transformer import AnomalyTransformer, anomaly_score
 from src.models.deep_baselines import LSTMAE
 from src.training.common import (full_eval, get_device, load_pretrain_pool,
                                  load_split, save_result, tune_threshold)
+from src.training.protocol import (atomic_torch_save, config_hash, git_sha,
+                                   ledger_append, ledger_check)
 
 
 @torch.no_grad()
@@ -44,13 +46,15 @@ def _batched_ae_scores(ae, X, dev, bs=256):
     return np.concatenate(out)
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="config/config.yaml")
     ap.add_argument("--clean", default="adaptive")
     ap.add_argument("--ae-epochs", type=int, default=10)
     ap.add_argument("--seed", type=int, default=None)
-    args = ap.parse_args()
+    ap.add_argument("--ledger-override", default=None, metavar="REASON",
+                    help="allow a repeated test evaluation; reason is logged")
+    args = ap.parse_args(argv)
 
     cfg = yaml.safe_load(open(args.config))
     TR = cfg["train"]
@@ -65,12 +69,22 @@ def main() -> None:
     labels_csv = cfg["paths"]["labels_csv"]
 
     dev = get_device(cfg)
+    chash = config_hash(cfg)
+    ck_path = os.path.join(art, "at_pretrained.pt")
+    runs = [("b10_at_unsup", ck_path if os.path.exists(ck_path) else None),
+            ("b7_lstmae", None)]
+    runs = [(t, c) for t, c in runs if t != "b10_at_unsup" or c]
+    for t, _ in runs:                    # refuse before touching anything
+        ledger_check(cfg, args.clean, t, chash, args.ledger_override)
+    for t, c in runs:
+        ledger_append(cfg, clean=args.clean, tag=t, chash=chash, overrides={},
+                      script="eval_unsupervised", checkpoint=c,
+                      override_reason=args.ledger_override)
 
     Xv, yv, ev, pv = load_split(dd, "val")
     Xte, yte, ete, pte = load_split(dd, "test")
 
     # ---------------------------------------------------------------- B10: AT unsup
-    ck_path = os.path.join(art, "at_pretrained.pt")
     if os.path.exists(ck_path):
         print("=== B10: Anomaly Transformer (unsupervised) ===")
         ck = torch.load(ck_path, map_location=dev)
@@ -85,6 +99,8 @@ def main() -> None:
         thr, f1v = tune_threshold(yv, sv)
         st = _batched_at_scores(m, Xte, dev)
         res = full_eval(yte, st, thr, ete, pte, labels_csv, cfg)
+        res.update({"val_f1": round(float(f1v), 4), "seed": seed,
+                    "config_hash": chash, "git_sha": git_sha()})
         save_result(art_root, args.clean, "b10_at_unsup", res)
         print(f"  val F1={f1v:.4f} | test F1={res['f1']:.4f} "
               f"AUC={res['roc_auc']:.4f} evR={res['event_recall']:.4f}")
@@ -116,13 +132,15 @@ def main() -> None:
     thr, f1v = tune_threshold(yv, sv)
     st = _batched_ae_scores(ae, Xte, dev)
     res = full_eval(yte, st, thr, ete, pte, labels_csv, cfg)
+    res.update({"val_f1": round(float(f1v), 4), "seed": seed,
+                "config_hash": chash, "git_sha": git_sha()})
     save_result(art_root, args.clean, "b7_lstmae", res)
     print(f"  val F1={f1v:.4f} | test F1={res['f1']:.4f} "
           f"AUC={res['roc_auc']:.4f} evR={res['event_recall']:.4f}")
 
     # Save trained AE for potential further analysis
-    torch.save({"state_dict": ae.state_dict(), "d_in": d_in},
-               os.path.join(art, "lstmae.pt"))
+    atomic_torch_save({"state_dict": ae.state_dict(), "d_in": d_in},
+                      os.path.join(art, "lstmae.pt"))
     print(f"\nResults saved -> {art}/b7_*/b10_*_test.json")
 
 

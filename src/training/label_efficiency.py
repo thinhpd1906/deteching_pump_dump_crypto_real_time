@@ -26,6 +26,7 @@ import numpy as np
 import yaml
 
 from src.training.finetune import run_tag
+from src.training.protocol import atomic_write_json
 
 FRACTIONS = [0.10, 0.25, 0.50, 1.00]
 MODELS = {"at_pre": ("at", True), "at_scratch": ("at", False),
@@ -70,7 +71,7 @@ def main():
         print(row)
 
     out = os.path.join(art, "label_efficiency.json")
-    json.dump(summary, open(out, "w"), indent=2)
+    atomic_write_json(summary, out)
     print(f"\nSaved -> {out}")
     if missing:
         print(f"Missing {len(missing)} runs (run scripts/kaggle_queue.py): "

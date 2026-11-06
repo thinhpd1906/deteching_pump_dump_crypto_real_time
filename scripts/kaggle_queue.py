@@ -80,6 +80,24 @@ def restore(src_root: str, art: str, mode: str) -> None:
                 n += 1
     print(f"restored {n} files from {src_root}")
 
+    # merge test ledgers (append-only): union of entries, original order kept
+    led = os.path.join(os.path.dirname(art), "test_ledger.jsonl")
+    seen = set(open(led).read().splitlines()) if os.path.exists(led) else set()
+    added = 0
+    for src in sorted(glob.glob(os.path.join(src_root, "**", "artifacts",
+                                             "test_ledger.jsonl"),
+                                recursive=True)):
+        if os.path.abspath(src) == os.path.abspath(led):
+            continue
+        for line in open(src).read().splitlines():
+            if line.strip() and line not in seen:
+                with open(led, "a") as fh:
+                    fh.write(line + "\n")
+                seen.add(line)
+                added += 1
+    if added:
+        print(f"merged {added} test-ledger entries")
+
 
 def main() -> None:
     ap = argparse.ArgumentParser()

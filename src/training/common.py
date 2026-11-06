@@ -224,11 +224,23 @@ def full_eval(y_true, scores, thr, end_ns, pair, labels_csv, cfg) -> dict:
 
 
 def save_result(artifacts_dir: str, mode: str, tag: str, res: dict) -> None:
-    out = os.path.join(artifacts_dir, mode)
-    os.makedirs(out, exist_ok=True)
-    res = {"tag": tag, **res}
-    with open(os.path.join(out, f"{tag}_test.json"), "w") as fh:
-        json.dump(res, fh, indent=2)
+    """Test result -> artifacts/<mode>/<tag>_test.json (atomic)."""
+    from src.training.protocol import atomic_write_json
+    atomic_write_json({"tag": tag, **res},
+                      os.path.join(artifacts_dir, mode, f"{tag}_test.json"))
+
+
+def search_result_path(artifacts_dir: str, mode: str, tag: str) -> str:
+    return os.path.join(artifacts_dir, mode, "search", f"{tag}_val.json")
+
+
+def save_search_result(artifacts_dir: str, mode: str, tag: str,
+                       res: dict) -> str:
+    """Val-only result -> artifacts/<mode>/search/<tag>_val.json (atomic)."""
+    from src.training.protocol import atomic_write_json
+    path = search_result_path(artifacts_dir, mode, tag)
+    atomic_write_json({"tag": tag, "split": "val", **res}, path)
+    return path
 
 
 # -------------------------------------------------------------- early stop

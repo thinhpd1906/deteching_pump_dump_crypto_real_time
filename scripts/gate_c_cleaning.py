@@ -48,6 +48,7 @@ import numpy as np
 from scipy import stats
 
 from src.data.features import FEATURES
+from src.training.protocol import atomic_write_json
 
 RNG = np.random.default_rng(42)
 KS_SAMPLE_CAP = 50000
@@ -166,7 +167,7 @@ def main():
         "gate_pass": any_pass,
         "triggers": triggers,
     }
-    json.dump(out, open("artifacts/gate_c_results.json", "w"), indent=2)
+    atomic_write_json(out, "artifacts/gate_c_results.json")
 
     print("\n" + "=" * 62)
     if any_pass:
