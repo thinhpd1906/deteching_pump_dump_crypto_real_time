@@ -46,6 +46,7 @@ model:
   n_heads: 4
   n_layers: 3           # pilot: use 2 for speed
   dropout: 0.1
+  cnn_dropout: 0.2      # CNN-BiLSTM dropout (its original hard-coded value)
   lambda_k: 3.0
   mask_ratio: 0.25
 
@@ -59,6 +60,13 @@ train:
   seed: 42
   amp: true             # fp16 autocast on GPU (T4 ~2x); ignored on CPU/MPS
   device: auto          # auto = cuda > mps > cpu; or force cuda|mps|cpu
+  # --- free knobs for the A4 search (defaults = behaviour before A4) ---
+  pretrain_lr: 1.0e-4   # pretrain optimizer lr (pretrain used train.lr before)
+  weight_decay: 0.01    # AdamW weight decay (PyTorch default, implicit before)
+  pos_weight_scale: 1.0 # multiplies the auto pos_weight inside BCE
+  label_smoothing: 0.0  # BCE targets -> y*(1-ls) + ls/2
+  finetune_mode: full   # pretrained AT only: full | frozen | layerwise
+  layerwise_decay: 1.0  # layerwise: lr x decay^depth (head depth 0)
 
 pipeline:
   kafka_bootstrap: localhost:9092
@@ -67,3 +75,37 @@ pipeline:
   topic_alerts: alerts
   live_symbols: [BTCUSDT, ETHUSDT]
   alert_threshold: null   # null = use threshold from saved checkpoint
+
+# ------------------------------------------------------------------
+# A4: time-boxed fair hyper-parameter search (VAL ONLY, never test).
+# Every arm gets the same common space and the same trial budget; arms run
+# round-robin so a time-box stop leaves equal trial counts.
+automation:
+  search:
+    arms: [at_pre, at_scratch, cnnbilstm]
+    budget_trials_per_arm: 30     # equal per arm; Bryan may change
+    stop_if_no_improve: 10        # arm stops after N completed trials w/o a new best
+    confirm_top_k: 3              # top configs re-run with seeds 0,1,2, still val-only
+    stop_at: "2026-11-23T23:59:00+07:00"
+    label_frac: 1.0
+    sampler_seed: 0
+    space:
+      common:                     # identical for every arm
+        train.lr: {type: loguniform, low: 1.0e-5, high: 1.0e-3}
+        train.weight_decay: {type: loguniform, low: 1.0e-4, high: 1.0e-1}
+        train.batch_size: {type: categorical, choices: [32, 64, 128, 256]}
+        train.patience: {type: categorical, choices: [4, 6, 10]}
+        train.pos_weight_scale: {type: loguniform, low: 0.25, high: 4.0}
+        train.label_smoothing: {type: uniform, low: 0.0, high: 0.1}
+        dropout: {type: uniform, low: 0.0, high: 0.3}   # model.dropout (AT) / model.cnn_dropout (CNN-BiLSTM)
+      at_pre:                     # how the pretrained weights are used
+        train.finetune_mode: {type: categorical, choices: [full, frozen, layerwise]}
+        train.layerwise_decay: {type: uniform, low: 0.5, high: 0.95, when: {train.finetune_mode: layerwise}}
+        pretrain: {type: categorical, choices: [canonical, e10, e20, e10_lr3e-4]}
+    pretrain_variants:            # canonical = artifacts/<mode>/at_pretrained.pt (5 epochs, lr 1e-4)
+      e10: {train.pretrain_epochs: 10, train.pretrain_lr: 1.0e-4}
+      e20: {train.pretrain_epochs: 20, train.pretrain_lr: 1.0e-4}
+      e10_lr3e-4: {train.pretrain_epochs: 10, train.pretrain_lr: 3.0e-4}
+  target:                         # VAL only
+    must_beat: b5_logreg
+    margin: seed_std

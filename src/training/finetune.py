@@ -61,7 +61,8 @@ from src.training.common import (EarlyStop, full_eval, get_device,
 from src.training.protocol import (add_protocol_args, apply_overrides,
                                    atomic_torch_save, config_hash, git_sha,
                                    ledger_append, ledger_check, override_suffix,
-                                   parse_set, semantic_overrides)
+                                   parse_set, pretrained_ckpt_path,
+                                   semantic_overrides)
 
 EXIT_INCOMPLETE = 75
 
@@ -75,6 +76,46 @@ def run_tag(arch: str, pretrained: bool, label_frac: float,
     if seed is not None:
         tag += f"_s{seed}"
     return tag
+
+
+def param_groups(model, arch: str, pretrained: bool, TR: dict, M: dict):
+    """Optimizer groups for train.finetune_mode (pretrained AT only).
+
+    full      : every parameter at train.lr (behaviour before A4)
+    frozen    : encoder frozen, only the classification head trains
+    layerwise : lr x layerwise_decay^depth; head depth 0, encoder norm 1,
+                encoder layer i depth n_layers-i+1, embedding deepest
+    """
+    mode = TR.get("finetune_mode", "full")
+    lr = float(TR["lr"])
+    if mode == "full":
+        return [{"params": [p for p in model.parameters() if p.requires_grad],
+                 "lr": lr}]
+    if not (arch == "at" and pretrained):
+        raise SystemExit(f"train.finetune_mode={mode} needs --arch at --pretrained")
+    if mode == "frozen":
+        for n, p in model.named_parameters():
+            if n.startswith("encoder."):
+                p.requires_grad_(False)
+        return [{"params": [p for p in model.parameters() if p.requires_grad],
+                 "lr": lr}]
+    if mode != "layerwise":
+        raise SystemExit(f"unknown train.finetune_mode: {mode}")
+    L, d = int(M["n_layers"]), float(TR.get("layerwise_decay", 1.0))
+    by_depth: dict[int, list] = {}
+    for n, p in model.named_parameters():
+        if not p.requires_grad:
+            continue
+        if n.startswith("head."):
+            depth = 0
+        elif n.startswith(("encoder.norm.", "encoder.recon.")):
+            depth = 1
+        elif n.startswith("encoder.layers."):
+            depth = L - int(n.split(".")[2]) + 1
+        else:                                   # embedding / positional
+            depth = L + 2
+        by_depth.setdefault(depth, []).append(p)
+    return [{"params": ps, "lr": lr * d ** k} for k, ps in sorted(by_depth.items())]
 
 
 def build_model(arch: str, win: int, d_in: int, M: dict,
@@ -93,7 +134,7 @@ def build_model(arch: str, win: int, d_in: int, M: dict,
         return ATClassifier(enc, M["d_model"], M["dropout"]).to(dev)
 
     if arch == "cnnbilstm":
-        return CNNBiLSTM(d_in).to(dev)
+        return CNNBiLSTM(d_in, dropout=M.get("cnn_dropout", 0.2)).to(dev)
 
     raise ValueError(f"unknown arch: {arch}")
 
@@ -175,16 +216,20 @@ def main(argv: list[str] | None = None) -> None:
     if dev == "cuda":
         torch.backends.cudnn.benchmark = True
 
-    pre_path = os.path.join(art, "at_pretrained.pt") if args.pretrained else None
+    pre_path = pretrained_ckpt_path(art, overrides) if args.pretrained else None
     model = build_model(args.arch, win, d_in, M, pre_path, dev)
 
     if TR["pos_class_weight"] == "auto":
         pw = float((ytr == 0).sum() / max((ytr == 1).sum(), 1))
     else:
         pw = float(TR["pos_class_weight"])
+    pw *= float(TR.get("pos_weight_scale", 1.0))
+    ls = float(TR.get("label_smoothing", 0.0))
 
     crit = torch.nn.BCEWithLogitsLoss(pos_weight=torch.tensor([pw], device=dev))
-    opt = torch.optim.AdamW(model.parameters(), lr=TR["lr"])
+    groups = param_groups(model, args.arch, args.pretrained, TR, M)
+    opt = torch.optim.AdamW(groups, lr=TR["lr"],
+                            weight_decay=float(TR.get("weight_decay", 0.01)))
     scaler = torch.amp.GradScaler("cuda", enabled=amp)
 
     # whole train split lives on the device: no per-sample DataLoader overhead
@@ -217,6 +262,7 @@ def main(argv: list[str] | None = None) -> None:
     print(f"  train N={len(ytr):,} (pos={int(ytr.sum()):,}, "
           f"label_frac={args.label_frac})")
     print(f"  pos_weight={pw:.1f}  device={dev}  amp={amp}  seed={seed}  "
+          f"mode={TR.get('finetune_mode', 'full')}  "
           f"epochs<={epochs}")
 
     ep_time = None
@@ -238,6 +284,8 @@ def main(argv: list[str] | None = None) -> None:
             xb, yb = Xg[idx], yg[idx]
             with torch.autocast("cuda", dtype=torch.float16, enabled=amp):
                 logit = forward_logits(model, xb)
+            if ls > 0:
+                yb = yb * (1.0 - ls) + 0.5 * ls
             loss = crit(logit.float(), yb)
             opt.zero_grad(set_to_none=True)
             scaler.scale(loss).backward()

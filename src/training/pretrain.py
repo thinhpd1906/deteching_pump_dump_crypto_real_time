@@ -34,7 +34,8 @@ from src.training.common import get_device, load_pretrain_pool, load_split
 from src.training.protocol import (apply_overrides, atomic_torch_save,
                                    atomic_write_json, config_hash,
                                    override_suffix, parse_set,
-                                   semantic_overrides)
+                                   pretrained_ckpt_path, semantic_overrides,
+                                   PRETRAIN_KEYS)
 
 
 def mask_input(x: torch.Tensor, ratio: float) -> torch.Tensor:
@@ -75,6 +76,9 @@ def main(argv: list[str] | None = None) -> None:
     args = ap.parse_args(argv)
 
     overrides = parse_set(args.set)
+    bad = [k for k in semantic_overrides(overrides) if k not in PRETRAIN_KEYS]
+    if bad:
+        raise SystemExit(f"pretrain --set accepts only {PRETRAIN_KEYS}; got {bad}")
     cfg = apply_overrides(yaml.safe_load(open(args.config)), overrides)
     M, TR = cfg["model"], cfg["train"]
     seed = args.seed if args.seed is not None else TR["seed"]
@@ -95,18 +99,15 @@ def main(argv: list[str] | None = None) -> None:
     dev = get_device(cfg)
     model = AnomalyTransformer(win, d_in, M["d_model"], M["n_heads"],
                                M["n_layers"], M["dropout"]).to(dev)
-    opt = torch.optim.AdamW(model.parameters(), lr=TR["lr"])
+    opt = torch.optim.AdamW(model.parameters(),
+                            lr=TR.get("pretrain_lr", TR["lr"]))
     epochs = args.epochs or TR["pretrain_epochs"]
 
-    suffix = override_suffix(overrides)
-    if suffix:
-        cache = os.path.join(art, "pretrain_cache")
-        path = os.path.join(cache, f"at_pretrained{suffix}.pt")
+    path = pretrained_ckpt_path(art, overrides)
+    if override_suffix(overrides):
         atomic_write_json({"overrides": semantic_overrides(overrides),
                            "config_hash": config_hash(cfg)},
-                          os.path.join(cache, f"at_pretrained{suffix}.json"))
-    else:
-        path = os.path.join(art, "at_pretrained.pt")
+                          path[:-3] + ".json")
     start_epoch = args.start_epoch or 1
     if args.resume:
         if not os.path.exists(path):
