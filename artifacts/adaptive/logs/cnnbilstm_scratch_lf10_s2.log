@@ -1,0 +1,19 @@
+=== FINETUNE [cnnbilstm_scratch_lf10_s2] on 'adaptive' ===
+  train N=16,055 (pos=1,431, label_frac=0.1)
+  pos_weight=10.2  device=mps  amp=False  seed=2  epochs<=30
+  ep 01  loss=1.2205  valF1=0.1531  thr=0.6784  (6s)  <- saved
+  ep 02  loss=1.1775  valF1=0.1559  thr=0.8038  (6s)  <- saved
+  ep 03  loss=1.1671  valF1=0.1612  thr=0.7760  (6s)  <- saved
+  ep 04  loss=1.1532  valF1=0.1660  thr=0.7938  (6s)  <- saved
+  ep 05  loss=1.1370  valF1=0.1511  thr=0.8009  (6s)
+  ep 06  loss=1.1157  valF1=0.1507  thr=0.8856  (6s)
+  ep 07  loss=1.0946  valF1=0.1483  thr=0.9047  (6s)
+  ep 08  loss=1.0782  valF1=0.1412  thr=0.9159  (6s)
+  ep 09  loss=1.0596  valF1=0.1443  thr=0.9338  (6s)
+  ep 10  loss=1.0473  valF1=0.1386  thr=0.8671  (6s)
+  early stop (no val improvement for 6 epochs)
+
+  TEST  F1=0.1651  P=0.2371  R=0.1267  ROC=0.7003  PR=0.1299
+  EVENT recall=1.0000 (50/50)  FA/symbol-day=4.929
+  F1 95% CI (bootstrap over symbols): [0.1366, 0.1965]
+  -> artifacts/adaptive/cnnbilstm_scratch_lf10_s2_test.json

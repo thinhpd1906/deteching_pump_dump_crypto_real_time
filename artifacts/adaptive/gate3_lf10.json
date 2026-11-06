@@ -1,0 +1,48 @@
+{
+  "a": [
+    "at_pre_lf10_s0",
+    "at_pre_lf10_s1",
+    "at_pre_lf10_s2"
+  ],
+  "b": [
+    "at_scratch_lf10_s0",
+    "at_scratch_lf10_s1",
+    "at_scratch_lf10_s2"
+  ],
+  "clean": "adaptive",
+  "f1_a": [
+    0.1746,
+    0.1783,
+    0.1956
+  ],
+  "f1_b": [
+    0.1095,
+    0.15,
+    0.1538
+  ],
+  "mean_a": 0.1828,
+  "std_a": 0.0091,
+  "mean_b": 0.1378,
+  "std_b": 0.0201,
+  "mean_diff": 0.0451,
+  "diff_ci95": [
+    0.0099,
+    0.0863
+  ],
+  "p_boot_diff_le_0": 0.0035,
+  "ci_a": [
+    0.14,
+    0.2356
+  ],
+  "ci_b": [
+    0.1142,
+    0.1635
+  ],
+  "wilcoxon_p": 0.06981,
+  "n_symbols": 29,
+  "n_symbols_with_pos": 28,
+  "n_boot": 2000,
+  "outside_seed_noise": true,
+  "significant": true,
+  "git_sha": "175d063a5ee05ee64d138fa9790a550604b5771c"
+}

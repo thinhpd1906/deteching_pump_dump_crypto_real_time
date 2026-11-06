@@ -1,0 +1,48 @@
+{
+  "a": [
+    "at_pre_lf50_s0",
+    "at_pre_lf50_s1",
+    "at_pre_lf50_s2"
+  ],
+  "b": [
+    "at_scratch_lf50_s0",
+    "at_scratch_lf50_s1",
+    "at_scratch_lf50_s2"
+  ],
+  "clean": "adaptive",
+  "f1_a": [
+    0.1724,
+    0.1623,
+    0.191
+  ],
+  "f1_b": [
+    0.1958,
+    0.1651,
+    0.1822
+  ],
+  "mean_a": 0.1752,
+  "std_a": 0.0119,
+  "mean_b": 0.1811,
+  "std_b": 0.0126,
+  "mean_diff": -0.0058,
+  "diff_ci95": [
+    -0.0195,
+    0.0095
+  ],
+  "p_boot_diff_le_0": 0.7645,
+  "ci_a": [
+    0.1391,
+    0.2158
+  ],
+  "ci_b": [
+    0.1436,
+    0.22
+  ],
+  "wilcoxon_p": 0.93748,
+  "n_symbols": 29,
+  "n_symbols_with_pos": 28,
+  "n_boot": 2000,
+  "outside_seed_noise": false,
+  "significant": false,
+  "git_sha": "175d063a5ee05ee64d138fa9790a550604b5771c"
+}

@@ -1,0 +1,121 @@
+jobs: 37 total, 9 done, 28 pending
+  pending: at_pre_lf10_s0
+  pending: at_scratch_lf10_s0
+  pending: at_pre_lf10_s1
+  pending: at_scratch_lf10_s1
+  pending: at_pre_lf10_s2
+  pending: at_scratch_lf10_s2
+  pending: b7_lstmae
+  pending: cnnbilstm_scratch_lf10_s0
+  pending: cnnbilstm_scratch_lf10_s1
+  pending: cnnbilstm_scratch_lf10_s2
+  pending: at_pre_lf25_s0
+  pending: at_scratch_lf25_s0
+  pending: cnnbilstm_scratch_lf25_s0
+  pending: at_pre_lf25_s1
+  pending: at_scratch_lf25_s1
+  pending: cnnbilstm_scratch_lf25_s1
+  pending: at_pre_lf25_s2
+  pending: at_scratch_lf25_s2
+  pending: cnnbilstm_scratch_lf25_s2
+  pending: at_pre_lf50_s0
+  pending: at_scratch_lf50_s0
+  pending: cnnbilstm_scratch_lf50_s0
+  pending: at_pre_lf50_s1
+  pending: at_scratch_lf50_s1
+  pending: cnnbilstm_scratch_lf50_s1
+  pending: at_pre_lf50_s2
+  pending: at_scratch_lf50_s2
+  pending: cnnbilstm_scratch_lf50_s2
+running on 1 worker(s), budget 48.0h
+
+[gpu0] START at_pre_lf10_s0  (2880 min left)
+jobs: 37 total, 9 done, 28 pending
+  pending: at_pre_lf10_s0 (partial, will resume)
+  pending: at_scratch_lf10_s0
+  pending: at_pre_lf10_s1
+  pending: at_scratch_lf10_s1
+  pending: at_pre_lf10_s2
+  pending: at_scratch_lf10_s2
+  pending: b7_lstmae
+  pending: cnnbilstm_scratch_lf10_s0
+  pending: cnnbilstm_scratch_lf10_s1
+  pending: cnnbilstm_scratch_lf10_s2
+  pending: at_pre_lf25_s0
+  pending: at_scratch_lf25_s0
+  pending: cnnbilstm_scratch_lf25_s0
+  pending: at_pre_lf25_s1
+  pending: at_scratch_lf25_s1
+  pending: cnnbilstm_scratch_lf25_s1
+  pending: at_pre_lf25_s2
+  pending: at_scratch_lf25_s2
+  pending: cnnbilstm_scratch_lf25_s2
+  pending: at_pre_lf50_s0
+  pending: at_scratch_lf50_s0
+  pending: cnnbilstm_scratch_lf50_s0
+  pending: at_pre_lf50_s1
+  pending: at_scratch_lf50_s1
+  pending: cnnbilstm_scratch_lf50_s1
+  pending: at_pre_lf50_s2
+  pending: at_scratch_lf50_s2
+  pending: cnnbilstm_scratch_lf50_s2
+running on 1 worker(s), budget 48.0h
+
+[gpu0] START at_pre_lf10_s0  (2880 min left)
+[gpu0] DONE  at_pre_lf10_s0  4 min  TEST  F1=0.1746  P=0.1386  R=0.2358  ROC=0.7393  PR=0.1356
+[gpu0] START at_scratch_lf10_s0  (2876 min left)
+[gpu0] DONE  at_scratch_lf10_s0  4 min  TEST  F1=0.1095  P=0.1076  R=0.1114  ROC=0.7296  PR=0.0824
+[gpu0] START at_pre_lf10_s1  (2872 min left)
+[gpu0] DONE  at_pre_lf10_s1  4 min  TEST  F1=0.1783  P=0.3027  R=0.1264  ROC=0.7412  PR=0.1498
+[gpu0] START at_scratch_lf10_s1  (2867 min left)
+[gpu0] DONE  at_scratch_lf10_s1  7 min  TEST  F1=0.1500  P=0.1744  R=0.1316  ROC=0.6927  PR=0.1077
+[gpu0] START at_pre_lf10_s2  (2861 min left)
+[gpu0] DONE  at_pre_lf10_s2  4 min  TEST  F1=0.1956  P=0.2339  R=0.1681  ROC=0.7304  PR=0.1439
+[gpu0] START at_scratch_lf10_s2  (2856 min left)
+[gpu0] DONE  at_scratch_lf10_s2  4 min  TEST  F1=0.1538  P=0.2106  R=0.1212  ROC=0.7010  PR=0.0970
+[gpu0] START b7_lstmae  (2852 min left)
+[gpu0] DONE  b7_lstmae  5 min  val F1=0.1491 | test F1=0.1825 AUC=0.7155 evR=1.0000
+[gpu0] START cnnbilstm_scratch_lf10_s0  (2847 min left)
+[gpu0] DONE  cnnbilstm_scratch_lf10_s0  1 min  TEST  F1=0.1856  P=0.1707  R=0.2033  ROC=0.7354  PR=0.1253
+[gpu0] START cnnbilstm_scratch_lf10_s1  (2846 min left)
+[gpu0] DONE  cnnbilstm_scratch_lf10_s1  1 min  TEST  F1=0.1601  P=0.2235  R=0.1248  ROC=0.6903  PR=0.1316
+[gpu0] START cnnbilstm_scratch_lf10_s2  (2844 min left)
+[gpu0] DONE  cnnbilstm_scratch_lf10_s2  1 min  TEST  F1=0.1651  P=0.2371  R=0.1267  ROC=0.7003  PR=0.1299
+[gpu0] START at_pre_lf25_s0  (2843 min left)
+[gpu0] DONE  at_pre_lf25_s0  7 min  TEST  F1=0.1392  P=0.2163  R=0.1026  ROC=0.6723  PR=0.1071
+[gpu0] START at_scratch_lf25_s0  (2836 min left)
+[gpu0] DONE  at_scratch_lf25_s0  7 min  TEST  F1=0.1484  P=0.1983  R=0.1186  ROC=0.6701  PR=0.1049
+[gpu0] START cnnbilstm_scratch_lf25_s0  (2828 min left)
+[gpu0] DONE  cnnbilstm_scratch_lf25_s0  3 min  TEST  F1=0.1357  P=0.2158  R=0.0990  ROC=0.5980  PR=0.1021
+[gpu0] START at_pre_lf25_s1  (2825 min left)
+[gpu0] DONE  at_pre_lf25_s1  6 min  TEST  F1=0.1600  P=0.3154  R=0.1072  ROC=0.7245  PR=0.1347
+[gpu0] START at_scratch_lf25_s1  (2819 min left)
+[gpu0] DONE  at_scratch_lf25_s1  6 min  TEST  F1=0.1640  P=0.1658  R=0.1622  ROC=0.6906  PR=0.1205
+[gpu0] START cnnbilstm_scratch_lf25_s1  (2813 min left)
+[gpu0] DONE  cnnbilstm_scratch_lf25_s1  2 min  TEST  F1=0.1467  P=0.4044  R=0.0896  ROC=0.6582  PR=0.1239
+[gpu0] START at_pre_lf25_s2  (2811 min left)
+[gpu0] DONE  at_pre_lf25_s2  5 min  TEST  F1=0.1913  P=0.2004  R=0.1831  ROC=0.7261  PR=0.1418
+[gpu0] START at_scratch_lf25_s2  (2807 min left)
+[gpu0] DONE  at_scratch_lf25_s2  5 min  TEST  F1=0.1520  P=0.2784  R=0.1046  ROC=0.6495  PR=0.1204
+[gpu0] START cnnbilstm_scratch_lf25_s2  (2801 min left)
+[gpu0] DONE  cnnbilstm_scratch_lf25_s2  2 min  TEST  F1=0.1815  P=0.2833  R=0.1336  ROC=0.6831  PR=0.1391
+[gpu0] START at_pre_lf50_s0  (2800 min left)
+[gpu0] DONE  at_pre_lf50_s0  14 min  TEST  F1=0.1724  P=0.1832  R=0.1629  ROC=0.7113  PR=0.1413
+[gpu0] START at_scratch_lf50_s0  (2786 min left)
+[gpu0] DONE  at_scratch_lf50_s0  6 min  TEST  F1=0.1958  P=0.2101  R=0.1834  ROC=0.7588  PR=0.1503
+[gpu0] START cnnbilstm_scratch_lf50_s0  (2780 min left)
+[gpu0] DONE  cnnbilstm_scratch_lf50_s0  3 min  TEST  F1=0.1833  P=0.1954  R=0.1726  ROC=0.7242  PR=0.1476
+[gpu0] START at_pre_lf50_s1  (2777 min left)
+[gpu0] DONE  at_pre_lf50_s1  8 min  TEST  F1=0.1623  P=0.1776  R=0.1495  ROC=0.6735  PR=0.1334
+[gpu0] START at_scratch_lf50_s1  (2768 min left)
+[gpu0] DONE  at_scratch_lf50_s1  8 min  TEST  F1=0.1651  P=0.2453  R=0.1244  ROC=0.7285  PR=0.1354
+[gpu0] START cnnbilstm_scratch_lf50_s1  (2761 min left)
+[gpu0] DONE  cnnbilstm_scratch_lf50_s1  2 min  TEST  F1=0.2045  P=0.2404  R=0.1779  ROC=0.7534  PR=0.1707
+[gpu0] START at_pre_lf50_s2  (2759 min left)
+[gpu0] DONE  at_pre_lf50_s2  6 min  TEST  F1=0.1910  P=0.2066  R=0.1775  ROC=0.7429  PR=0.1455
+[gpu0] START at_scratch_lf50_s2  (2753 min left)
+[gpu0] DONE  at_scratch_lf50_s2  7 min  TEST  F1=0.1822  P=0.1933  R=0.1723  ROC=0.7456  PR=0.1359
+[gpu0] START cnnbilstm_scratch_lf50_s2  (2746 min left)
+[gpu0] DONE  cnnbilstm_scratch_lf50_s2  2 min  TEST  F1=0.2037  P=0.2396  R=0.1772  ROC=0.7428  PR=0.1602
+
+session finished in 2.3h; 37/37 jobs done

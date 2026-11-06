@@ -1,0 +1,17 @@
+=== FINETUNE [at_scratch_lf50_s0] on 'adaptive' ===
+  train N=80,416 (pos=7,296, label_frac=0.5)
+  pos_weight=10.0  device=mps  amp=False  seed=0  epochs<=30
+  ep 01  loss=1.1844  valF1=0.1742  thr=0.8056  (43s)  <- saved
+  ep 02  loss=1.1440  valF1=0.1947  thr=0.8078  (43s)  <- saved
+  ep 03  loss=1.1216  valF1=0.1905  thr=0.8627  (43s)
+  ep 04  loss=1.1060  valF1=0.1916  thr=0.7996  (43s)
+  ep 05  loss=1.0978  valF1=0.1891  thr=0.8523  (43s)
+  ep 06  loss=1.0865  valF1=0.1840  thr=0.8773  (43s)
+  ep 07  loss=1.0749  valF1=0.1742  thr=0.9035  (43s)
+  ep 08  loss=1.0660  valF1=0.1783  thr=0.8409  (43s)
+  early stop (no val improvement for 6 epochs)
+
+  TEST  F1=0.1958  P=0.2101  R=0.1834  ROC=0.7588  PR=0.1503
+  EVENT recall=1.0000 (50/50)  FA/symbol-day=8.335
+  F1 95% CI (bootstrap over symbols): [0.1505, 0.2397]
+  -> artifacts/adaptive/at_scratch_lf50_s0_test.json

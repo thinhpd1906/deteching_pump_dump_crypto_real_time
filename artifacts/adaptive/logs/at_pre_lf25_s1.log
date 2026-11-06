@@ -1,0 +1,20 @@
+  loaded pretrained encoder <- artifacts/adaptive/at_pretrained.pt
+=== FINETUNE [at_pre_lf25_s1] on 'adaptive' ===
+  train N=40,216 (pos=3,656, label_frac=0.25)
+  pos_weight=10.0  device=mps  amp=False  seed=1  epochs<=30
+  ep 01  loss=1.2165  valF1=0.1502  thr=0.8102  (31s)  <- saved
+  ep 02  loss=1.1829  valF1=0.1528  thr=0.6490  (31s)  <- saved
+  ep 03  loss=1.1673  valF1=0.1628  thr=0.8007  (31s)  <- saved
+  ep 04  loss=1.1618  valF1=0.1711  thr=0.8145  (32s)  <- saved
+  ep 05  loss=1.1542  valF1=0.1549  thr=0.7913  (31s)
+  ep 06  loss=1.1550  valF1=0.1649  thr=0.7960  (31s)
+  ep 07  loss=1.1456  valF1=0.1558  thr=0.7837  (32s)
+  ep 08  loss=1.1410  valF1=0.1607  thr=0.8163  (31s)
+  ep 09  loss=1.1349  valF1=0.1543  thr=0.8594  (31s)
+  ep 10  loss=1.1324  valF1=0.1583  thr=0.7361  (31s)
+  early stop (no val improvement for 6 epochs)
+
+  TEST  F1=0.1600  P=0.3154  R=0.1072  ROC=0.7245  PR=0.1347
+  EVENT recall=1.0000 (50/50)  FA/symbol-day=2.811
+  F1 95% CI (bootstrap over symbols): [0.1310, 0.1944]
+  -> artifacts/adaptive/at_pre_lf25_s1_test.json

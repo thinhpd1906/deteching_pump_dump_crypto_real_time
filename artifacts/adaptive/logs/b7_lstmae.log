@@ -1,0 +1,17 @@
+=== B10: Anomaly Transformer (unsupervised) ===
+  val F1=0.1236 | test F1=0.1163 AUC=0.7036 evR=1.0000
+
+=== B7: LSTM Autoencoder (unsupervised) ===
+  epoch 01/10  mse=0.641449  (22.0s)
+  epoch 02/10  mse=0.627843  (21.5s)
+  epoch 03/10  mse=0.614413  (21.3s)
+  epoch 04/10  mse=0.598312  (21.1s)
+  epoch 05/10  mse=0.586344  (21.4s)
+  epoch 06/10  mse=0.576706  (21.5s)
+  epoch 07/10  mse=0.568775  (21.3s)
+  epoch 08/10  mse=0.562774  (21.3s)
+  epoch 09/10  mse=0.562304  (21.4s)
+  epoch 10/10  mse=0.560190  (21.5s)
+  val F1=0.1491 | test F1=0.1825 AUC=0.7155 evR=1.0000
+
+Results saved -> artifacts/adaptive/b7_*/b10_*_test.json

@@ -1,0 +1,19 @@
+{
+  "tag": "b10_at_unsup",
+  "precision": 0.0735,
+  "recall": 0.2788,
+  "f1": 0.1163,
+  "roc_auc": 0.7036,
+  "pr_auc": 0.0547,
+  "event_recall": 1.0,
+  "events_detected": 50,
+  "events_total": 50,
+  "fa_per_symbol_day": 42.492,
+  "f1_lo": 0.0767,
+  "f1_hi": 0.171,
+  "thr": 0.024286,
+  "val_f1": 0.1236,
+  "seed": 42,
+  "config_hash": "9b3f1e26de36499c",
+  "git_sha": "175d063a5ee05ee64d138fa9790a550604b5771c"
+}

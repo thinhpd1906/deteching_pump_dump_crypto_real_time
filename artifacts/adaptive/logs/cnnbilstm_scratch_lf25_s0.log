@@ -1,0 +1,30 @@
+=== FINETUNE [cnnbilstm_scratch_lf25_s0] on 'adaptive' ===
+  train N=40,211 (pos=3,651, label_frac=0.25)
+  pos_weight=10.0  device=mps  amp=False  seed=0  epochs<=30
+  ep 01  loss=1.1994  valF1=0.1624  thr=0.7516  (9s)  <- saved
+  ep 02  loss=1.1522  valF1=0.1595  thr=0.8802  (9s)
+  ep 03  loss=1.1322  valF1=0.1603  thr=0.9147  (9s)
+  ep 04  loss=1.1197  valF1=0.1667  thr=0.7978  (9s)  <- saved
+  ep 05  loss=1.1047  valF1=0.1670  thr=0.8435  (9s)  <- saved
+  ep 06  loss=1.0915  valF1=0.1698  thr=0.8036  (9s)  <- saved
+  ep 07  loss=1.0824  valF1=0.1661  thr=0.8047  (9s)
+  ep 08  loss=1.0826  valF1=0.1697  thr=0.8198  (9s)
+  ep 09  loss=1.0615  valF1=0.1759  thr=0.8518  (9s)  <- saved
+  ep 10  loss=1.0534  valF1=0.1756  thr=0.8524  (9s)
+  ep 11  loss=1.0411  valF1=0.1702  thr=0.8414  (9s)
+  ep 12  loss=1.0226  valF1=0.1696  thr=0.9122  (9s)
+  ep 13  loss=1.0202  valF1=0.1663  thr=0.8802  (9s)
+  ep 14  loss=1.0016  valF1=0.1776  thr=0.9153  (9s)  <- saved
+  ep 15  loss=0.9953  valF1=0.1792  thr=0.8743  (9s)  <- saved
+  ep 16  loss=0.9787  valF1=0.1740  thr=0.8685  (9s)
+  ep 17  loss=0.9730  valF1=0.1671  thr=0.8148  (9s)
+  ep 18  loss=0.9605  valF1=0.1674  thr=0.8631  (9s)
+  ep 19  loss=0.9467  valF1=0.1719  thr=0.8948  (9s)
+  ep 20  loss=0.9314  valF1=0.1694  thr=0.9277  (9s)
+  ep 21  loss=0.9332  valF1=0.1746  thr=0.8973  (9s)
+  early stop (no val improvement for 6 epochs)
+
+  TEST  F1=0.1357  P=0.2158  R=0.0990  ROC=0.5980  PR=0.1021
+  EVENT recall=0.9800 (49/50)  FA/symbol-day=4.35
+  F1 95% CI (bootstrap over symbols): [0.1132, 0.1617]
+  -> artifacts/adaptive/cnnbilstm_scratch_lf25_s0_test.json

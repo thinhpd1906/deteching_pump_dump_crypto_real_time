@@ -1,0 +1,22 @@
+=== FINETUNE [at_scratch_lf25_s0] on 'adaptive' ===
+  train N=40,211 (pos=3,651, label_frac=0.25)
+  pos_weight=10.0  device=mps  amp=False  seed=0  epochs<=30
+  ep 01  loss=1.2002  valF1=0.1436  thr=0.6939  (31s)  <- saved
+  ep 02  loss=1.1475  valF1=0.1477  thr=0.8494  (31s)  <- saved
+  ep 03  loss=1.1223  valF1=0.1533  thr=0.8602  (31s)  <- saved
+  ep 04  loss=1.1074  valF1=0.1614  thr=0.8565  (31s)  <- saved
+  ep 05  loss=1.0860  valF1=0.1754  thr=0.8030  (31s)  <- saved
+  ep 06  loss=1.0636  valF1=0.1758  thr=0.8038  (31s)  <- saved
+  ep 07  loss=1.0483  valF1=0.1774  thr=0.8732  (32s)  <- saved
+  ep 08  loss=1.0344  valF1=0.1720  thr=0.9101  (31s)
+  ep 09  loss=1.0180  valF1=0.1722  thr=0.8781  (31s)
+  ep 10  loss=0.9961  valF1=0.1667  thr=0.8924  (31s)
+  ep 11  loss=0.9824  valF1=0.1710  thr=0.9213  (31s)
+  ep 12  loss=0.9642  valF1=0.1597  thr=0.9462  (31s)
+  ep 13  loss=0.9438  valF1=0.1597  thr=0.9485  (31s)
+  early stop (no val improvement for 6 epochs)
+
+  TEST  F1=0.1484  P=0.1983  R=0.1186  ROC=0.6701  PR=0.1049
+  EVENT recall=0.9400 (47/50)  FA/symbol-day=5.795
+  F1 95% CI (bootstrap over symbols): [0.1175, 0.1806]
+  -> artifacts/adaptive/at_scratch_lf25_s0_test.json
