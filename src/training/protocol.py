@@ -32,15 +32,18 @@ LOCKED_PREFIXES = (
     "split.",      # chronological 70/15/15
     "cleaning.",   # fixed per mode; changing it needs a dataset rebuild
     "pipeline.",   # serving, not research
+    "automation.", # search settings, not a training knob
 )
 LOCKED_KEYS = {
     "model.d_model", "model.n_heads", "model.n_layers",   # AT size 64/4/3
     "model.mask_ratio",                                   # 25% masking
     "model.lambda_k",                                     # k = 3
 }
+# Keys read only by pretrain.py; they select the pretrained checkpoint.
+PRETRAIN_KEYS = ("train.pretrain_epochs", "train.pretrain_lr")
 # Keys that do not change the experiment (excluded from hash and tag).
 NON_SEMANTIC_KEYS = {"train.device"}
-HASH_EXCLUDE_SECTIONS = ("paths", "pipeline")
+HASH_EXCLUDE_SECTIONS = ("paths", "pipeline", "automation")
 
 
 # ------------------------------------------------------------- overrides
@@ -116,11 +119,43 @@ def override_suffix(overrides: dict) -> str:
     return "" if not sem else "_o" + _h(sem)[:8]
 
 
+def pretrain_overrides(overrides: dict) -> dict:
+    return {k: v for k, v in sorted(overrides.items()) if k in PRETRAIN_KEYS}
+
+
+def pretrained_ckpt_path(art_mode_dir: str, overrides: dict) -> str:
+    """Checkpoint a fine-tune with these overrides must start from.
+
+    No pretrain keys overridden -> the canonical at_pretrained.pt; otherwise
+    the cached variant written by `pretrain --set <same pretrain keys>`.
+    """
+    sfx = override_suffix(pretrain_overrides(overrides))
+    if not sfx:
+        return os.path.join(art_mode_dir, "at_pretrained.pt")
+    return os.path.join(art_mode_dir, "pretrain_cache", f"at_pretrained{sfx}.pt")
+
+
+# Knobs added in A4 whose default reproduces the behaviour before they
+# existed. At that value they are left out of the hash, so the default
+# config keeps the hash already recorded in the test ledger.
+LEGACY_DEFAULTS = {
+    "train.pretrain_lr": 1.0e-4, "train.weight_decay": 0.01,
+    "train.pos_weight_scale": 1.0, "train.label_smoothing": 0.0,
+    "train.finetune_mode": "full", "train.layerwise_decay": 1.0,
+    "model.cnn_dropout": 0.2,
+}
+
+
 def config_hash(cfg: dict) -> str:
     """Hash of the effective experiment config (paths/serving/device excluded)."""
     c = {k: v for k, v in cfg.items() if k not in HASH_EXCLUDE_SECTIONS}
     c = copy.deepcopy(c)
-    for key in NON_SEMANTIC_KEYS:
+    drop = set(NON_SEMANTIC_KEYS)
+    for key, dflt in LEGACY_DEFAULTS.items():
+        sec, name = key.split(".", 1)
+        if isinstance(c.get(sec), dict) and c[sec].get(name, dflt) == dflt:
+            drop.add(key)
+    for key in drop:
         sec, name = key.split(".", 1)
         if isinstance(c.get(sec), dict):
             c[sec].pop(name, None)
