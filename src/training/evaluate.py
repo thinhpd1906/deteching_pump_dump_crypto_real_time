@@ -16,6 +16,7 @@ import argparse
 import glob
 import json
 import os
+import re
 
 import numpy as np
 import yaml
@@ -39,16 +40,32 @@ EVENT_COLS  = ["event_recall", "fa_per_symbol_day"]
 CI_COLS     = ["f1_lo", "f1_hi"]
 
 
+def _seed_runs(art: str, tag: str) -> list[dict]:
+    """All seed runs of a full-label tag: exactly {tag}_s<N>_test.json
+    (never label-fraction runs, never suffixed runs such as _final)."""
+    pat = re.compile(rf"^{re.escape(tag)}_s\d+_test\.json$")
+    return [json.load(open(os.path.join(art, f)))
+            for f in sorted(os.listdir(art)) if pat.match(f)] \
+        if os.path.isdir(art) else []
+
+
 def _read(art: str, tag: str) -> dict | None:
-    # try exact tag first, then seed runs (never label-fraction runs)
-    for pattern in [
-        os.path.join(art, f"{tag}_test.json"),
-        os.path.join(art, f"{tag}_s*_test.json"),
-    ]:
-        hits = sorted(glob.glob(pattern))
-        if hits:
-            return json.load(open(hits[-1]))   # latest
-    return None
+    """Single-run tag -> its JSON. Multi-seed tag -> MEAN over seeds of every
+    numeric field, plus n_seeds and f1_std (paper rows are seed means)."""
+    single = os.path.join(art, f"{tag}_test.json")
+    if os.path.exists(single):
+        d = json.load(open(single))
+        d.setdefault("n_seeds", 1)
+        return d
+    runs = _seed_runs(art, tag)
+    if not runs:
+        return None
+    keys = {k for r in runs for k, v in r.items()
+            if isinstance(v, (int, float)) and not isinstance(v, bool)}
+    out = {k: float(np.mean([r[k] for r in runs if k in r])) for k in keys}
+    out["n_seeds"] = len(runs)
+    out["f1_std"] = float(np.std([r["f1"] for r in runs]))
+    return out
 
 
 def _fmt(d: dict | None, cols: list[str]) -> str:
@@ -75,9 +92,10 @@ def print_table1(art: str) -> list[dict]:
     header = (f"{'Method':<{w}} | "
               + " | ".join(f"{c:>7}" for c in WINDOW_COLS)
               + " | " + " | ".join(f"{c:>9}" for c in EVENT_COLS)
-              + " | F1 95% CI")
+              + " | F1 95% CI          | F1 mean±std (seeds)")
     sep = "-" * len(header)
-    print("\n=== TABLE 1 -- METHOD COMPARISON ===")
+    print("\n=== TABLE 1 -- METHOD COMPARISON (multi-seed rows = mean over seeds;"
+          " CI = mean of per-seed symbol-bootstrap bounds) ===")
     print(header); print(sep)
 
     rows = []
@@ -86,7 +104,9 @@ def print_table1(art: str) -> list[dict]:
         wrow = _fmt(d, WINDOW_COLS)
         erow = _fmt(d, EVENT_COLS)
         ci = f"[{d.get('f1_lo', float('nan')):.4f},{d.get('f1_hi', float('nan')):.4f}]" if d else " n/a "
-        print(f"{name:<{w}} | {wrow} | {erow} | {ci}")
+        ms = (f"{d['f1']:.4f}±{d.get('f1_std', 0):.4f} (n={d['n_seeds']})"
+              if d else " n/a ")
+        print(f"{name:<{w}} | {wrow} | {erow} | {ci} | {ms}")
         rows.append(d)
     return rows
 
@@ -107,12 +127,6 @@ def print_table2(art_root: str, tag: str = "at_pre") -> None:
         erow = _fmt(d, EVENT_COLS)
         ci = f"[{d.get('f1_lo', float('nan')):.4f},{d.get('f1_hi', float('nan')):.4f}]" if d else " n/a "
         print(f"{mode:<{w}} | {wrow} | {erow} | {ci}")
-
-
-def _seed_runs(art: str, tag: str) -> list[dict]:
-    """All seed runs of a full-label tag (tag_s0, tag_s1, ...)."""
-    return [json.load(open(h)) for h in
-            sorted(glob.glob(os.path.join(art, f"{tag}_s*_test.json")))]
 
 
 def gate3_check(art: str) -> None:
