@@ -40,11 +40,12 @@ Serving: `src/pipeline/inference_service.py` imports `bars_to_features`/`normali
 
 1. WHO I AM WORKING WITH
 Name: Bryan (Phan Đức Thịnh) — Master's student at HUST + Android dev at Viettel (TV360)
-Language: English for technical work, Vietnamese OK for casual explanation
-Style: Direct answers preferred. Complete working code over snippets.
-Machine: Windows, VS Code + Claude Code CLI
-Project folder: C:\Users\phant\Desktop\pnd-thesis-agents\
-Virtual env: .venv\Scripts\python.exe — always activate before running Python
+Language: English for technical work, Vietnamese OK for casual explanation (Bryan often writes in Vietnamese; answer in Vietnamese when he does)
+Style: Direct answers preferred. Complete working code over snippets. Explain in prose, not bullet lists. Be honest about weak results and academic risks.
+PRIMARY MACHINE (since 2026-11-06): Mac mini M4 Pro, Claude Code CLI. Project folder: ~/pnd-thesis. Venv: `source .venv/bin/activate` (always before Python). Set `PYTORCH_ENABLE_MPS_FALLBACK=1`. Long jobs run inside tmux session `thesis`.
+Old machine (being retired): Windows laptop, C:\Users\phant\Desktop\pnd-thesis-agents\, venv .venv\Scripts\python.exe. Windows-only paths elsewhere in this file refer to that machine.
+GPU: Apple MPS on the Mac (code needs task A1 to use it), Kaggle T4 x2 for heavy runs.
+Commits: author thinhpd only. NEVER add a Co-Authored-By line or any Claude/AI attribution.
 GitHub: github.com/thinhpd1906/deteching_pump_dump_crypto_real_time
 Supervisor: GCN/anomaly detection on behavioral graphs (ACIIDS 2023, RIVF 2021)
 2. THESIS IDENTITY
@@ -228,13 +229,17 @@ Do NOT use bullet points when explaining to user — use prose
 [✓] Week 5: Model implementation + pretrain — pretrain complete, 347x unsupervised separation (see Section 6 Part E)
 [→] Week 6-7: Fine-tuning on Kaggle GPU (at_pre, at_scratch, cnnbilstm × 3 seeds each) + unsupervised eval (B7, B10) + label-efficiency + Gate 3
     First single-session attempt needed >8h → reworked (2026-10-12) into a resumable multi-session queue: scripts/kaggle_queue.py runs 37 jobs in priority order (Gate 3 core first), skips any job whose {tag}_test.json exists, finetune saves {tag}_last.pt every epoch and exits 75 before the deadline. Chain sessions by attaching the previous notebook version's output as input (Step 5 --restore). Speed-ups: GPU-resident batches, fp16 AMP (train.amp), 2 parallel jobs on T4 x2, vectorised threshold tuning (verified identical to sklearn), label-efficiency 100% point reuses main fine-tune runs instead of retraining.
-[ ] Week 8: Tables + figures + 4-page draft → GO/PIVOT decision
+    Status 2026-11-06: 100%-label runs DONE (thesis_kaggle_output/: at_pre 0.1850±0.0043, at_scratch 0.1929±0.0043, cnnbilstm 0.1860±0.0048 test F1). 10%-label runs, B7/B10, 25/50% points NOT done.
+[→] Week 6-7b (2026-11-06): moving to the Mac mini + Phase A of Section 19 (device support, val-only search mode + test ledger, Gate 3 at 10%, fair tuning until 2026-11-23 freeze, C3 latency).
+[ ] 2026-11-23: method freeze → single test run → ICBC paper writing → submit 2026-12-03
+[ ] Week 8: Tables + figures + draft → GO/PIVOT decision (now merged into the ICBC paper push)
 17. SESSION START CHECKLIST
-Run /status to see current state
-Check artifacts/ for latest results
-Ask: "What is my next step based on current progress?" if unsure
-Always activate venv before running Python: .venv\Scripts\Activate.ps1
-Always run claude from project root so CLAUDE.md is auto-loaded
+Read Section 20 (handoff state) first: it says where we stopped and what's open.
+Run /status to see current state; check artifacts/ and thesis_kaggle_output/ for latest results.
+Mac: `cd ~/pnd-thesis && source .venv/bin/activate`, work inside `tmux attach -t thesis`.
+Ask: "What is my next step based on current progress?" if unsure.
+Always run claude from project root so CLAUDE.md is auto-loaded.
+Keep Section 20 current at the end of each session (what was done, what's open).
 ## 18. SELF-UPDATE RULE (IMPORTANT)
 
 After every completed task, gate, or week milestone, Claude Code MUST:
@@ -322,3 +327,26 @@ B8 Explain files (VI + EN) after each stage: what ran, what came out, what it me
 B9 Report + slides only after the final human checkpoint (@report-agent, @slide-agent), numbers filled by script and checked.
 B10 If Mac training is slow: Kaggle CLI `kernels push/status/output` to chain GPU sessions within the weekly quota.
 Before trusting Phase B: pull the power cable during a fine-tune; the Mac must come back, resume from the last epoch and notify Bryan with nobody touching it.
+
+## 20. HANDOFF STATE (last updated 2026-11-06, end of the last Windows session)
+
+Where we are: Week 6–7. Bryan is moving fully to the Mac mini and will work with Claude Code there. Gates: G1 PASS, GC PASS, G2 FAIL (overridden, §5), G3 fails at 100% labels; the decisive 10%-label check is still pending.
+
+What the planning sessions decided (all of it is in Sections 2, 19):
+The goal is an ACCEPTED paper before the June 2027 defense. Primary venue is IEEE ICBC 2027 (submit 3 Dec 2026, decision 19 Feb 2027). Backup venues are used sequentially after a rejection, never in parallel (dual submission is forbidden). Before the deadline the priority is the paper, not automation infrastructure: Phase A of §19 now, Phase B (24/7 orchestrator, launchd, Telegram, literature fetch, report/slides) after the submission.
+The research loop may retrain with new methods/hyperparameters as often as needed, but reuses cached data/labels/split/scaler, judges on validation only, gives every compared arm an equal budget, and never touches test until a human-approved freeze. Report and slides are made once at the end, after Bryan confirms the results.
+"Paper-ready" means one condition per claim: C1 Gate C (done); C2 at 10% labels at_pre beats at_scratch outside seed noise (paired symbol bootstrap); the headline model is at least as good as the best classical baseline (LogReg); C3 p95 bar-close→alert latency < 5 s measured live; the protocol rules in §9. Fallback if C2 fails: a C1+C3-led systems paper with SSL reported honestly as a negative/mixed result.
+
+Mac setup status: `scripts/mac/bootstrap.sh` (one command, §19.1) ran on the Mac through step 4 (venv OK, torch 2.15.0, MPS available). It stopped at step 5 (Kaggle credentials): Kaggle now shows a token on screen instead of downloading kaggle.json; the script was fixed (commit 49dc22a8) to accept a pasted token and verify login. Next: re-run the bootstrap, paste the token, let it download data and verify the manifest.
+Raw data (`data/raw`, 154 MB) is NOT on Kaggle or GitHub. It exists as `C:\Users\phant\Desktop\pnd-raw.tgz` on the Windows laptop; copy it to `~/pnd-dl/` on the Mac before retiring Windows. Training does not need it; dataset rebuilds and Gate 1 do.
+Kaggle auth on Windows uses the new OAuth style (~/.kaggle/credentials.json + access_token), not kaggle.json.
+
+Open items for Bryan:
+1. Security on the Mac: 2FA on the account used for Tailscale; SSH key-only (password login still ON after bootstrap); Remote Login limited to his user; firewall ON; check devices in the Tailscale admin console. If the Mac is company-managed (Viettel), ask IT before running the Tailscale VPN.
+2. Start the 10%-label runs (Kaggle or Mac, after task A1). This is the most important missing result.
+3. Ask the supervisor: ICBC (3 Dec) vs ACIIDS (hard deadline 14 Nov), not both; does HUST require acceptance or only submission before the defense; is a C1+C3-led paper acceptable if C2 fails; keep the 60-min lead-in label window locked for this submission?
+4. Approve the Optuna "free to search" list and the trial budget (default 30 per arm) before task A4.
+5. Approve new top-level folders (paper/, runs/, research/, reports/, slides/, docs/) when first needed.
+6. The GitHub repo is public: consider making it private before submission (double-blind review).
+
+Known code facts to remember: finetune.py and baselines.py evaluate test on every run today (must get the `--search` val-only mode, task A2, before any tuning). The docstring at the top of src/training/common.py says the bootstrap resamples over "EVENTS" but the code (correctly) resamples over SYMBOLS; fix the docstring. The data manifest (config/data_manifest.json) was generated on Windows; Kaggle copies of processed data and at_pretrained.pt were verified byte-identical to it.
