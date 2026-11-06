@@ -1,6 +1,42 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 CLAUDE.md — Master Project Briefing
 
 Auto-loaded at the start of every Claude Code session. Contains all locked decisions, real run results, and lessons learned. Do not reopen locked decisions without Bryan's explicit approval.
+
+0. COMMANDS & CODE ARCHITECTURE
+
+Commands (run from project root with the venv active; every entry point is a module taking `--config config/config.yaml`, and most take `--clean {none,static,adaptive}`, default adaptive):
+```
+pip install -r requirements.txt
+python -m pytest tests/ -v                                   # architecture smoke tests only (no training)
+python -m pytest tests/test_anomaly_transformer.py -v -k <name>   # single test
+python -m src.data.download_labels                            # -> data/labels/pumps_binance.csv
+python -m src.data.download_binance [--limit-events N]        # -> data/raw/<PAIR>/
+python scripts/gate1_alignment.py [--limit-events N]          # Gate 1
+python -m src.data.build_dataset --clean all                  # -> data/processed/<mode>/
+python scripts/gate_c_cleaning.py                             # Gate C
+python -m src.models.baselines --clean adaptive               # B1-B6, Gate 2
+python -m src.training.pretrain [--resume --start-epoch N]    # SSL -> artifacts/<mode>/at_pretrained.pt
+python -m src.training.eval_unsupervised                      # B7 LSTM-AE, B10 AT-unsup
+python -m src.training.finetune --arch {at,cnnbilstm} [--pretrained] --seed S [--label-frac 0.1] [--deadline T]
+python -m src.training.label_efficiency --seeds 3
+python -m src.training.evaluate                               # Table 1, Table 2, Gate 3 check
+python scripts/kaggle_queue.py --list | --restore <prev_output> [--budget-hours 11]
+docker compose up -d                                          # Kafka + UI (localhost:8080)
+python -m src.pipeline.kafka_producer / python_bars / spark_streaming / inference_service --model at_pre
+```
+`scripts/run_pilot.sh` and `scripts/run_all_experiments.sh` show the full dependency order. No linter is configured.
+
+Data flow: aggTrades zips (data/raw/<PAIR>/) → `src/cleaning/filters.py` (clean_ticks, mode none/static/adaptive) → `src/data/features.py` (trades_to_bars → normalize_bars → bars_to_features → make_windows → label_windows) → `src/data/build_dataset.py` writes per-mode `{train,val,test}.npz` (keys X, y, end_ns, pair), `unlabeled_pretrain.npz`, `scaler.json`. Split boundaries come from global pump-time quantiles of the labels CSV.
+
+Training/eval: `src/training/common.py` is the single home of the evaluation protocol (load_split applies scaler.json, tune_threshold on val, metric_table, event_metrics, symbol-level bootstrap_ci, full_eval, save_result). Every model script ends in `save_result` → `artifacts/<mode>/<tag>_test.json`; `evaluate.py` and `kaggle_queue.py` discover results purely by that filename. Tags are built by `finetune.run_tag`: `{arch}_{pre|scratch}[_lf{pct}][_s{seed}]` — keep this naming stable or the queue/tables break. Models live in `src/models/anomaly_transformer.py` (AnomalyTransformer for pretraining, ATClassifier head for fine-tuning) and `src/models/deep_baselines.py` (CNNBiLSTM, LSTMAE); classical baselines in `src/models/baselines.py`.
+
+Kaggle: `kaggle-notebook/pnd_finetuning_kaggle.ipynb` drives `scripts/kaggle_queue.py`, which skips jobs whose result JSON exists; finetune writes `{tag}_last.pt` each epoch and exits with code 75 (EXIT_INCOMPLETE) near `--deadline` so the next session resumes. Downloaded Kaggle outputs land in `thesis_kaggle_output/` locally.
+
+Serving: `src/pipeline/inference_service.py` imports `bars_to_features`/`normalize_bars` from `src/data/features.py` and loads the same `scaler.json` and checkpoint threshold — this import is the train↔serve parity guarantee (C3); never duplicate feature logic in the pipeline. `python_bars.py` is the no-Spark fallback for `spark_streaming.py`.
 
 1. WHO I AM WORKING WITH
 Name: Bryan (Phan Đức Thịnh) — Master's student at HUST + Android dev at Viettel (TV360)
@@ -65,7 +101,11 @@ KS test (none vs adaptive): z_ret stat=0.00162 p≈1.0, z_vol stat=0.00554 p=0.4
 ANOMALY resolved: adaptive's k0=6.0×rolling-tick-σ threshold exceeds static's flat 2% for 62/84 pairs on average (thin/illiquid 2018-era altcoins) — verified pair-by-pair across all 84 pairs, confirmed as a genuine calibration finding, not a bug. Adaptive removes less overall but removes the RIGHT trades (preserves pump-adjacent signal) — a stronger result for C1 than raw removal count would have been.
 Recommendation for paper: report as intentional trade-off; consider a k0 sensitivity sweep {3,4,5,6} as future-work for a second independent pass criterion (not applied — needs approval)
 Artifacts: artifacts/gate_c_results.json
-Gate 3 — SSL Helps (at_pre > at_scratch outside CI) ⏳ PENDING (pretrain done, fine-tune next)
+Gate 3 — SSL Helps (at_pre > at_scratch outside CI) ⚠️ FAIL at 100% labels — 10% check PENDING
+Full-label result (2026-10-12, Kaggle, 3 seeds, test window F1): at_pre 0.1791 ± 0.0089 vs at_scratch 0.1899 ± 0.0054 → pretraining did not help at full labels (scratch slightly ahead, gap ~1 std)
+Both AT variants ≈ B5 LogReg test F1 0.1893 → deep sequence model does NOT yet beat the pooled classical baseline (see §12 Gate 2 note: this is the trigger to discuss revisiting the label window — Bryan's call)
+Latest Kaggle output (thesis_kaggle_output/, 3 seeds, test F1): at_pre 0.1850 ± 0.0043, at_scratch 0.1929 ± 0.0043, cnnbilstm 0.1860 ± 0.0048; all reach event recall ≈1.0 (50/50); fa/symbol-day 6–10. Label-efficiency file only contains the 100% point so far.
+Still needed before verdict: 10%-of-events label-efficiency runs, event recall / PR-AUC / CIs from the result JSONs, B7/B10
 Pretrain sanity check (2026-09-25): unsupervised anomaly score already separates pumps — positive=7.65 vs negative=0.022 (347x separation) with ZERO label supervision. Strong leading indicator for Gate 3.
 Most important: check at 10% label fraction (SSL pays under scarcity)
 If FAIL at 100% but PASS at 10% → Contribution 2 still alive

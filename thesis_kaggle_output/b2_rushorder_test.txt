@@ -1,0 +1,15 @@
+{
+  "tag": "b2_rushorder",
+  "precision": 0.0142,
+  "recall": 0.0401,
+  "f1": 0.021,
+  "roc_auc": 0.5546,
+  "pr_auc": 0.0206,
+  "event_recall": 0.38,
+  "events_detected": 19,
+  "events_total": 50,
+  "fa_per_symbol_day": 33.654,
+  "f1_lo": 0.0104,
+  "f1_hi": 0.0329,
+  "thr": 5.058006
+}

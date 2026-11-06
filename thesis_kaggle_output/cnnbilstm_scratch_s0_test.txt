@@ -1,0 +1,18 @@
+{
+  "tag": "cnnbilstm_scratch_s0",
+  "precision": 0.2112,
+  "recall": 0.1648,
+  "f1": 0.1851,
+  "roc_auc": 0.7257,
+  "pr_auc": 0.1552,
+  "event_recall": 1.0,
+  "events_detected": 50,
+  "events_total": 50,
+  "fa_per_symbol_day": 7.441,
+  "f1_lo": 0.1362,
+  "f1_hi": 0.2355,
+  "thr": 0.825388,
+  "val_f1": 0.1707,
+  "label_frac": 1.0,
+  "seed": 0
+}

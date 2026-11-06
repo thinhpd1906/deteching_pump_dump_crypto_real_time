@@ -1,0 +1,15 @@
+{
+  "tag": "b5_logreg",
+  "precision": 0.1808,
+  "recall": 0.1987,
+  "f1": 0.1893,
+  "roc_auc": 0.7454,
+  "pr_auc": 0.1591,
+  "event_recall": 1.0,
+  "events_detected": 50,
+  "events_total": 50,
+  "fa_per_symbol_day": 10.882,
+  "f1_lo": 0.1418,
+  "f1_hi": 0.242,
+  "thr": 0.775199
+}

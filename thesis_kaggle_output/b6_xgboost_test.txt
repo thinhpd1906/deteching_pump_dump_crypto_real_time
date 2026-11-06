@@ -1,0 +1,15 @@
+{
+  "tag": "b6_xgboost",
+  "precision": 0.2141,
+  "recall": 0.128,
+  "f1": 0.1602,
+  "roc_auc": 0.6799,
+  "pr_auc": 0.1358,
+  "event_recall": 0.98,
+  "events_detected": 49,
+  "events_total": 50,
+  "fa_per_symbol_day": 5.681,
+  "f1_lo": 0.1277,
+  "f1_hi": 0.198,
+  "thr": 0.756445
+}
