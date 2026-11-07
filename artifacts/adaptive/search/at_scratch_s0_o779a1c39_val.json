@@ -1,0 +1,33 @@
+{
+  "tag": "at_scratch_s0_o779a1c39",
+  "split": "val",
+  "precision": 0.1866,
+  "recall": 0.1644,
+  "f1": 0.1748,
+  "roc_auc": 0.7001,
+  "pr_auc": 0.1365,
+  "event_recall": 1.0,
+  "events_detected": 50,
+  "events_total": 50,
+  "fa_per_symbol_day": 8.441,
+  "f1_lo": 0.1391,
+  "f1_hi": 0.213,
+  "thr": 0.873446,
+  "val_f1": 0.1748,
+  "label_frac": 1.0,
+  "seed": 0,
+  "arch": "at",
+  "pretrained": false,
+  "overrides": {
+    "model.dropout": 0.09465468930181888,
+    "train.batch_size": 256,
+    "train.label_smoothing": 0.06918771139504734,
+    "train.lr": 0.0005659503131926907,
+    "train.patience": 10,
+    "train.pos_weight_scale": 1.0963140561774434,
+    "train.weight_decay": 0.04828586218554464
+  },
+  "config_hash": "7fcb333ac907f1ef",
+  "git_sha": "215da72d768e3af465a190a766a8ddd2e3bc4660",
+  "epochs_run": 12
+}

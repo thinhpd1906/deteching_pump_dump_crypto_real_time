@@ -1,0 +1,17 @@
+{
+  "tag": "b1_rule",
+  "split": "val",
+  "precision": 0.0261,
+  "recall": 0.4433,
+  "f1": 0.0492,
+  "roc_auc": 0.5843,
+  "pr_auc": 0.0301,
+  "event_recall": 0.96,
+  "events_detected": 48,
+  "events_total": 50,
+  "fa_per_symbol_day": 195.114,
+  "f1_lo": 0.0416,
+  "f1_hi": 0.0578,
+  "thr": -0.05969,
+  "config_hash": "9b3f1e26de36499c"
+}

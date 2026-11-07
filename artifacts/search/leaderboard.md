@@ -1,14 +1,14 @@
 # A4 search leaderboard (VALIDATION F1 only, test never used)
 
-Updated 2026-11-07T04:18. Budget 30 trials/arm, stop_at 2026-11-23T23:59:00+07:00.
+Updated 2026-11-07T09:30. Budget 30 trials/arm, stop_at 2026-11-23T23:59:00+07:00.
 
 Target: beat `b5_logreg` val F1 = 0.1696 by margin = seed_std.
 
 | arm | trials done | failed | best seed-0 val F1 | proposed config (top by 3-seed mean) | 3-seed val F1 | beats target |
 |---|---|---|---|---|---|---|
-| at_pre | 12 | 0 | 0.1945 | (confirm phase pending) |  |  |
-| at_scratch | 24 | 0 | 0.1897 | (confirm phase pending) |  |  |
-| cnnbilstm | 14 | 0 | 0.1782 | (confirm phase pending) |  |  |
+| at_pre | 12 | 0 | 0.1945 | t1: `{'train.lr': 0.0005495716186411617, 'train.weight_decay': 0.08626905220714909, 'train.batch_size': 32, 'train.patience': 10, 'train.pos_weight_scale': 1.062448776694192, 'train.label_smoothing': 0.04146619399905236, 'model.dropout': 0.07936668363138809, 'train.finetune_mode': 'full', 'train.pretrain_epochs': 10, 'train.pretrain_lr': 0.0001}` | 0.1910 ± 0.0071 | yes |
+| at_scratch | 24 | 0 | 0.1897 | t13: `{'train.lr': 4.7446855437968263e-05, 'train.weight_decay': 0.08909944882166042, 'train.batch_size': 64, 'train.patience': 10, 'train.pos_weight_scale': 2.310010424384453, 'train.label_smoothing': 0.046435191239550186, 'model.dropout': 0.237079276275306}` | 0.1897 ± 0.0022 | yes |
+| cnnbilstm | 14 | 0 | 0.1782 | t6: `{'train.lr': 3.3074211974723665e-05, 'train.weight_decay': 0.0014476702711160212, 'train.batch_size': 32, 'train.patience': 4, 'train.pos_weight_scale': 0.26835297130960717, 'train.label_smoothing': 0.06622020192683258, 'model.cnn_dropout': 0.11625702776198443}` | 0.1751 ± 0.0017 | yes |
 
 ## at_pre: top 10 trials
 

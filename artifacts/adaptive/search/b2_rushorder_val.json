@@ -1,0 +1,17 @@
+{
+  "tag": "b2_rushorder",
+  "split": "val",
+  "precision": 0.0326,
+  "recall": 0.072,
+  "f1": 0.0449,
+  "roc_auc": 0.5522,
+  "pr_auc": 0.0236,
+  "event_recall": 0.42,
+  "events_detected": 21,
+  "events_total": 50,
+  "fa_per_symbol_day": 25.123,
+  "f1_lo": 0.0292,
+  "f1_hi": 0.0628,
+  "thr": 5.058006,
+  "config_hash": "9b3f1e26de36499c"
+}

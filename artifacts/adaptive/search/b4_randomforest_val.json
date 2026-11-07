@@ -1,0 +1,17 @@
+{
+  "tag": "b4_randomforest",
+  "split": "val",
+  "precision": 0.2688,
+  "recall": 0.1285,
+  "f1": 0.1738,
+  "roc_auc": 0.68,
+  "pr_auc": 0.1391,
+  "event_recall": 1.0,
+  "events_detected": 50,
+  "events_total": 50,
+  "fa_per_symbol_day": 4.114,
+  "f1_lo": 0.1424,
+  "f1_hi": 0.207,
+  "thr": 0.406335,
+  "config_hash": "9b3f1e26de36499c"
+}

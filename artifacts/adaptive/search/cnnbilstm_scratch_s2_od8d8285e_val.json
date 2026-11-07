@@ -1,0 +1,33 @@
+{
+  "tag": "cnnbilstm_scratch_s2_od8d8285e",
+  "split": "val",
+  "precision": 0.2312,
+  "recall": 0.1335,
+  "f1": 0.1693,
+  "roc_auc": 0.6877,
+  "pr_auc": 0.1428,
+  "event_recall": 1.0,
+  "events_detected": 50,
+  "events_total": 50,
+  "fa_per_symbol_day": 5.229,
+  "f1_lo": 0.1342,
+  "f1_hi": 0.2094,
+  "thr": 0.763216,
+  "val_f1": 0.1693,
+  "label_frac": 1.0,
+  "seed": 2,
+  "arch": "cnnbilstm",
+  "pretrained": false,
+  "overrides": {
+    "model.cnn_dropout": 0.23296775549913007,
+    "train.batch_size": 128,
+    "train.label_smoothing": 0.043674726302679906,
+    "train.lr": 0.000386611625197214,
+    "train.patience": 4,
+    "train.pos_weight_scale": 0.8180062964429848,
+    "train.weight_decay": 0.005495567374990245
+  },
+  "config_hash": "54c9b58d07aa9876",
+  "git_sha": "05f5fc68b667c80448ee5d1e53251084d4bc4717",
+  "epochs_run": 6
+}
